@@ -7,13 +7,25 @@
   <base href="https://wearenextgen.io/" target="_top">
   <title>Next Gen Creative Systems — Selected Work and Services</title>
   <style>
-    html,body{margin:0;overflow-x:hidden;background:transparent;color:#fff}
-    body{padding:12px 0 10px;font-family:"Oswald",Arial,sans-serif}
-    .ng-home-combo__services{margin-top:clamp(38px,6vw,76px)}
-    @media(max-width:640px){body{padding-top:8px}.ng-home-combo__services{margin-top:32px}}
+    html,body{margin:0;overflow:hidden;background:transparent;color:#fff}
+    body{padding:10px 0;font-family:"Oswald",Arial,sans-serif}
+    #ng-home-combo-v1{width:min(92vw,1200px);margin:0 auto}
+    .ng-home-combo__switch{display:flex;align-items:center;gap:8px;margin:0 0 16px}
+    .ng-home-combo__switch button{min-height:44px;padding:9px 15px;border:1px solid rgba(255,255,255,.7);border-radius:999px;background:rgba(255,255,255,.08);color:#fff;font:700 .78rem/1 "Oswald",Arial,sans-serif;letter-spacing:.09em;cursor:pointer;transition:background .2s ease,box-shadow .2s ease,transform .2s ease}
+    .ng-home-combo__switch button[aria-selected="true"],.ng-home-combo__switch button:hover,.ng-home-combo__switch button:focus-visible{background:#8115ff;box-shadow:0 0 24px rgba(129,21,255,.72);transform:translateY(-1px)}
+    .ng-home-combo__panel[hidden]{display:none!important}
+    .ng-home-combo__panel>#ng-client-carousel-v1,.ng-home-combo__panel>#ng-home-services-v1{width:100%}
+    @media(max-width:640px){body{padding-top:8px}.ng-home-combo__switch{margin-bottom:12px}.ng-home-combo__switch button{flex:1;padding-inline:10px;font-size:.69rem}}
+    @media(prefers-reduced-motion:reduce){.ng-home-combo__switch button{transition:none}}
   </style>
 </head>
 <body>
+<div id="ng-home-combo-v1">
+  <div class="ng-home-combo__switch" role="tablist" aria-label="Explore the studio">
+    <button type="button" role="tab" id="ng-home-combo-work-tab" aria-selected="true" aria-controls="ng-home-combo-work">SELECTED WORK</button>
+    <button type="button" role="tab" id="ng-home-combo-services-tab" aria-selected="false" aria-controls="ng-home-combo-services">WHAT WE BUILD</button>
+  </div>
+  <section class="ng-home-combo__panel" id="ng-home-combo-work" role="tabpanel" aria-labelledby="ng-home-combo-work-tab">
 <div id="ng-client-carousel-v1" class="ng-client-carousel" aria-labelledby="ng-client-carousel-title">
   <div class="ng-client-carousel__head">
     <div>
@@ -174,7 +186,8 @@
 })();
 </script>
 
-<div class="ng-home-combo__services">
+  </section>
+  <section class="ng-home-combo__panel" id="ng-home-combo-services" role="tabpanel" aria-labelledby="ng-home-combo-services-tab" hidden>
 
 <div id="ng-home-services-v1" class="ng-home-services" aria-labelledby="ng-home-services-title">
   <div class="ng-home-services__head">
@@ -299,6 +312,29 @@
 })();
 </script>
 
+  </section>
 </div>
+<script>
+(() => {
+  const root = document.querySelector('#ng-home-combo-v1');
+  if (!root) return;
+  const tabs = [...root.querySelectorAll('[role="tab"]')];
+  const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
+  const show = index => {
+    tabs.forEach((tab, i) => tab.setAttribute('aria-selected', String(i === index)));
+    panels.forEach((panel, i) => panel.hidden = i !== index);
+  };
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => show(index));
+    tab.addEventListener('keydown', event => {
+      if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      show(next);
+      tabs[next].focus();
+    });
+  });
+})();
+</script>
 </body>
 </html>
