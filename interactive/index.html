@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="dark">
+  <base target="_top">
+  <title>Next Gen — Custom Digital Product Sampler</title>
+  <script src="https://use.typekit.net/ik/g6Xx0HDtzVB2xN7yhcHyIAgUcAdgj9Bld5wIU6CUV9Mfe86JXnX1IyvhF2jtFRZLFRbXjRy8jD9XwQIoZebXFebU52FyF2bae6MKgcBCZcBkdKJ4Z1mXiW4yOWgXH6GJCnSfIMMjgfMfH6qJyB9bMs6IJMHbMZYntwXe.js" async onload="try{Typekit.load()}catch(e){}"></script>
+  <style>
+    @font-face{font-family:Oswald;font-style:normal;font-weight:400;font-display:swap;src:url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/c02dd75d-df69-4519-9bfc-eedeadf97567/latin.woff2') format('woff2')}
+    @font-face{font-family:Oswald;font-style:normal;font-weight:700;font-display:swap;src:url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/90ab4a5d-8a5b-4f76-b1ac-22b64d8b3e35/latin.woff2') format('woff2')}
+    :root{--purple:#8115ff;--violet:#b777ff;--ink:#111016;--paper:#fff;--lilac:#eee6ff;--cyan:#63e8ff;--heading:Alfarn,Impact,"Arial Black",sans-serif;--body:Oswald,"Arial Narrow",sans-serif}
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:var(--paper);font-family:var(--body)}
+    button,a{-webkit-tap-highlight-color:transparent}
+    button{font:inherit}
+    [hidden]{display:none!important}
+    .machine{width:min(1180px,96vw);height:100%;margin:auto;padding:10px 0;display:grid;grid-template-rows:auto 1fr;gap:10px}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:7px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(8,6,12,.82);box-shadow:0 14px 38px rgba(0,0,0,.28)}
+    .tab{position:relative;min-height:46px;padding:9px 14px;border:1px solid transparent;border-radius:999px;background:transparent;color:#d7cfdf;font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:.2s ease}
+    .tab::before{content:"";display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#4a4352;vertical-align:1px}
+    .tab[aria-selected="true"]{color:#fff;background:var(--purple);box-shadow:0 0 28px rgba(129,21,255,.72)}
+    .tab[aria-selected="true"]::before{background:#fff;box-shadow:0 0 12px #fff}
+    .tab:hover,.tab:focus-visible{border-color:#fff;color:#fff}
+    :focus-visible{outline:3px solid #fff;outline-offset:3px}
+    .panels,.panel{min-height:0;height:100%}
+    .panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.5);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(129,21,255,.13) 42%,rgba(7,6,10,.92));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 20px 60px rgba(0,0,0,.32)}
+    .panel::after{content:"";position:absolute;inset:-65% 40% 65% -30%;transform:rotate(-14deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);pointer-events:none}
+    .panel-grid{height:100%;display:grid;grid-template-columns:minmax(245px,.62fr) minmax(0,1.38fr);gap:0}
+    .copy{position:relative;z-index:1;padding:clamp(20px,3vw,36px);display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,.25)}
+    .eyebrow{margin:0 0 9px;color:#d9bdff;font-weight:700;font-size:.69rem;letter-spacing:.13em;text-transform:uppercase}
+    h2{margin:0;max-width:12ch;font-family:var(--heading);font-size:clamp(2rem,4.2vw,4rem);font-weight:400;line-height:.88;text-transform:uppercase}
+    .accent{display:inline;padding:0 .08em .03em;color:var(--purple);background:#fff;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+    .lede{max-width:32rem;margin:15px 0 0;color:#e0d9e6;font-size:clamp(.9rem,1.2vw,1.02rem);line-height:1.42}
+    .proofline{margin:14px 0 0;color:#b9afc1;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}
+    .cta{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;min-height:46px;margin-top:18px;padding:10px 16px;border:1px solid #fff;border-radius:999px;color:#111;text-decoration:none;background:#fff;font-weight:700;font-size:.77rem;letter-spacing:.05em;text-transform:uppercase;transition:.18s ease}
+    .cta:hover,.cta:focus-visible{color:#fff;background:var(--purple);box-shadow:0 0 24px rgba(129,21,255,.7)}
+    .stage{position:relative;min-width:0;padding:clamp(14px,2vw,24px);display:grid;place-items:center;background:radial-gradient(circle at 78% 16%,rgba(183,119,255,.25),transparent 40%),linear-gradient(135deg,rgba(255,255,255,.06),transparent 50%)}
+    .plastic{position:relative;width:min(100%,720px);height:min(100%,350px);min-height:300px;overflow:hidden;border:2px solid rgba(255,255,255,.85);border-radius:32px;background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(238,230,255,.94) 52%,rgba(199,171,255,.76));color:var(--ink);box-shadow:inset 0 2px 2px rgba(255,255,255,.95),inset 0 -16px 35px rgba(129,21,255,.13),0 0 34px rgba(129,21,255,.3)}
+    .plastic::before{content:"";position:absolute;inset:9px;border:1px solid rgba(74,38,110,.2);border-radius:24px;pointer-events:none}
+    .chrome{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:10px 16px;border-bottom:1px solid rgba(52,31,72,.25);background:linear-gradient(#fff,#d9d1e3);font-size:.69rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .lights{display:flex;gap:6px}.lights i{width:9px;height:9px;border-radius:50%;background:var(--purple);box-shadow:0 0 10px rgba(129,21,255,.9)}.lights i:nth-child(2){background:var(--cyan);box-shadow:0 0 10px rgba(99,232,255,.9)}
+    .portal-body{height:calc(100% - 46px);display:grid;grid-template-columns:1.25fr .75fr;gap:12px;padding:14px}
+    .proof{position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(135deg,#211027,#8115ff 55%,#ff87dd);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
+    .proof::before{content:"ORBIT / 04";position:absolute;left:18px;top:18px;padding:5px 8px;background:#fff;color:#28122c;font-family:var(--heading);font-size:clamp(1.1rem,2.5vw,2rem);line-height:1}
+    .proof::after{content:"GENERIC CAMPAIGN PROOF";position:absolute;left:18px;bottom:18px;color:#fff;font-size:.67rem;letter-spacing:.13em}
+    .planet{position:absolute;width:180px;aspect-ratio:1;right:8%;top:18%;border-radius:50%;background:radial-gradient(circle at 34% 27%,#fff,#d99bff 9%,#8115ff 42%,#29103e 75%);box-shadow:0 0 35px rgba(255,255,255,.42)}
+    .portal-side{display:flex;flex-direction:column;gap:10px}
+    .status{padding:12px;border:1px solid rgba(39,20,54,.25);border-radius:14px;background:rgba(255,255,255,.55)}
+    .status small{display:block;color:#62596a;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase}.status strong{display:block;margin-top:5px;font-family:var(--heading);font-size:1.4rem;line-height:1;text-transform:uppercase}
+    .approval-actions{display:grid;gap:8px;margin-top:auto}.approval-actions button{min-height:44px;border:1px solid #2b2030;border-radius:999px;background:transparent;color:#211824;font-weight:700;font-size:.72rem;text-transform:uppercase;cursor:pointer}.approval-actions .approve{border-color:var(--purple);background:var(--purple);color:#fff}.approval-actions button:hover{transform:translateY(-1px)}
+    .b2h-stage{width:min(100%,720px);height:min(100%,350px);min-height:300px;display:grid;grid-template-columns:minmax(0,1.38fr) minmax(190px,.62fr);gap:12px}
+    .b2h-media{position:relative;overflow:hidden;border:2px solid #fff;border-radius:28px;background:#fff;box-shadow:0 0 34px rgba(129,21,255,.3)}
+    .b2h-media img{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
+    .b2h-count{position:absolute;left:14px;bottom:14px;padding:7px 10px;border-radius:999px;background:rgba(10,8,15,.82);color:#fff;font-size:.68rem;letter-spacing:.1em}
+    .b2h-controls{display:flex;flex-direction:column;justify-content:center;gap:10px;padding:18px;border:1px solid rgba(255,255,255,.65);border-radius:26px;background:linear-gradient(160deg,#fff,#e9ddff);color:#18121e}
+    .b2h-controls strong{font-family:var(--heading);font-size:1.7rem;line-height:.94;text-transform:uppercase}.b2h-controls p{margin:0;color:#554c5d;font-size:.79rem;line-height:1.38}.arrows{display:flex;gap:8px;margin-top:8px}.arrows button{width:46px;height:46px;border:1px solid #24192b;border-radius:50%;background:#fff;color:#1b1420;font-size:1.1rem;cursor:pointer}.arrows button:hover,.arrows button:focus-visible{background:var(--purple);color:#fff}
+    .game-shell{width:min(100%,760px);height:min(100%,350px);min-height:300px;overflow:hidden;border:2px solid rgba(255,255,255,.88);border-radius:30px;background:#09070d;box-shadow:0 0 35px rgba(129,21,255,.35)}
+    .game-shell iframe{width:100%;height:100%;border:0;display:block;background:#09070d;color-scheme:dark}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:720px){
+      .machine{width:100%;padding:6px 0;gap:8px}.tabs{gap:4px;padding:5px;border-radius:20px}.tab{min-height:52px;padding:7px 5px;border-radius:15px;font-size:.62rem;line-height:1.15}.tab::before{display:block;margin:0 auto 5px}
+      .panel{border-radius:22px}.panel-grid{grid-template-columns:1fr;grid-template-rows:auto 1fr}.copy{padding:16px 18px 13px;border-right:0;border-bottom:1px solid rgba(255,255,255,.24)}h2{font-size:2.05rem;max-width:none}.lede{margin-top:9px;font-size:.82rem;line-height:1.35}.proofline{display:none}.cta{position:absolute;right:16px;top:15px;min-height:40px;margin:0;padding:8px 11px;font-size:.62rem}.stage{padding:10px;align-items:stretch}.plastic,.b2h-stage,.game-shell{min-height:0;height:100%;max-height:none}
+      .portal-body{grid-template-columns:1.25fr .75fr;padding:9px;gap:7px}.proof::before{left:10px;top:10px;font-size:1rem}.proof::after{left:10px;bottom:10px;font-size:.5rem}.planet{width:105px}.status{padding:8px}.status strong{font-size:1rem}.approval-actions{gap:5px}.approval-actions button{min-height:44px;font-size:.58rem}
+      .b2h-stage{grid-template-columns:1.3fr .7fr;gap:7px}.b2h-media{border-radius:19px}.b2h-controls{padding:10px;border-radius:19px}.b2h-controls strong{font-size:1.05rem}.b2h-controls p{font-size:.66rem}.arrows{margin-top:2px}.arrows button{width:44px;height:44px}
+      .game-shell{border-radius:20px}
+    }
+    @media(max-width:430px){.cta{display:none}.copy{padding-right:16px}.chrome{padding:8px 11px}.chrome>span:first-child{max-width:22ch}.portal-body{grid-template-columns:1fr 112px}.b2h-stage{grid-template-columns:1fr 116px}.b2h-controls{padding:8px}.b2h-controls strong{font-family:var(--body);font-size:.82rem;line-height:1;overflow-wrap:normal;word-break:normal}.b2h-controls p{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <main class="machine" aria-label="Custom digital product sampler">
+    <div class="tabs" role="tablist" aria-label="Try a digital product type">
+      <button class="tab" id="tab-portal" type="button" role="tab" aria-selected="true" aria-controls="panel-portal">Client portal</button>
+      <button class="tab" id="tab-tool" type="button" role="tab" aria-selected="false" aria-controls="panel-tool" tabindex="-1">Branded tool</button>
+      <button class="tab" id="tab-game" type="button" role="tab" aria-selected="false" aria-controls="panel-game" tabindex="-1">Playable world</button>
+    </div>
+    <div class="panels">
+      <section class="panel" id="panel-portal" role="tabpanel" aria-labelledby="tab-portal">
+        <div class="panel-grid">
+          <div class="copy"><p class="eyebrow">Interactive prototype / invented records</p><h2>A portal with a <span class="accent">job.</span></h2><p class="lede">Review files, collect focused feedback and make the next approval state obvious.</p><p class="proofline">Front-end specimen · no real client data · no backend</p><a class="cta" href="/contact?project=client-portal">Map a portal ↗</a></div>
+          <div class="stage">
+            <div class="plastic" aria-label="Front-end-only approval portal demo">
+              <div class="chrome"><span>NG / Proof Desk / Version 04</span><span class="lights" aria-hidden="true"><i></i><i></i></span></div>
+              <div class="portal-body"><div class="proof"><span class="planet" aria-hidden="true"></span></div><div class="portal-side"><div class="status"><small>Demo state</small><strong data-portal-status>Needs approval</strong></div><div class="status"><small>Open notes</small><strong data-notes>02</strong></div><div class="approval-actions"><button type="button" data-portal-action="changes">Request changes</button><button class="approve" type="button" data-portal-action="approve">Approve proof</button></div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="panel" id="panel-tool" role="tabpanel" aria-labelledby="tab-tool" hidden>
+        <div class="panel-grid">
+          <div class="copy"><p class="eyebrow">Sanitized case note / B2H</p><h2>A private pitch made <span class="accent">explorable.</span></h2><p class="lede">A recipient-specific invitation became a guided product and mission experience using official supplied media.</p><p class="proofline">Platform concept shown safely · no private invite URL</p><a class="cta" href="/contact?project=b2h-private-walkthrough">Request a walkthrough ↗</a></div>
+          <div class="stage">
+            <div class="b2h-stage"><figure class="b2h-media"><img data-b2h-image src="assets/b2h-invitation-hero-desktop.jpg" alt="Desktop view of a personalized Back2Health invitation for the fictional recipient Nefeli"><figcaption class="b2h-count" data-b2h-count>01 / 03</figcaption></figure><div class="b2h-controls"><strong data-b2h-title>Personalized welcome</strong><p data-b2h-copy>One reusable invitation, safely personalized for a fictional recipient.</p><div class="arrows"><button type="button" data-b2h-prev aria-label="Show previous B2H proof">←</button><button type="button" data-b2h-next aria-label="Show next B2H proof">→</button></div></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="panel" id="panel-game" role="tabpanel" aria-labelledby="tab-game" hidden>
+        <div class="panel-grid">
+          <div class="copy"><p class="eyebrow">Playable proof / browser game</p><h2>Make the campaign <span class="accent">playable.</span></h2><p class="lede">A browser mini-game can turn a character, release or launch into something people actively enter.</p><p class="proofline">Working game · keyboard and touch controls</p><a class="cta" href="/contact?project=interactive-experience">Make it playable ↗</a></div>
+          <div class="stage"><div class="game-shell"><iframe src="https://wearenextgen.github.io/Alien-Retro-Game-Embed/?embed=1" title="Playable Next Gen alien retro browser game" loading="lazy"></iframe></div></div>
+        </div>
+      </section>
+    </div>
+    <p class="sr-only" aria-live="polite" data-announcer></p>
+  </main>
+  <script>
+    (()=>{
+      document.querySelectorAll('a.cta[href^="/"]').forEach(a=>a.href=`https://wearenextgen.io${a.getAttribute('href')}`);
+      const tabs=[...document.querySelectorAll('[role="tab"]')],panels=tabs.map(t=>document.getElementById(t.getAttribute('aria-controls'))),announce=document.querySelector('[data-announcer]');
+      const activate=(i,focus=false)=>{tabs.forEach((t,n)=>{const on=n===i;t.setAttribute('aria-selected',String(on));t.tabIndex=on?0:-1;panels[n].hidden=!on});announce.textContent=`${tabs[i].textContent.trim()} selected.`;if(focus)tabs[i].focus()};
+      tabs.forEach((t,i)=>{t.addEventListener('click',()=>activate(i));t.addEventListener('keydown',e=>{let n=null;if(['ArrowRight','ArrowDown'].includes(e.key))n=(i+1)%tabs.length;if(['ArrowLeft','ArrowUp'].includes(e.key))n=(i-1+tabs.length)%tabs.length;if(e.key==='Home')n=0;if(e.key==='End')n=tabs.length-1;if(n===null)return;e.preventDefault();activate(n,true)})});
+      const portalStatus=document.querySelector('[data-portal-status]'),notes=document.querySelector('[data-notes]');document.querySelectorAll('[data-portal-action]').forEach(b=>b.addEventListener('click',()=>{const approved=b.dataset.portalAction==='approve';portalStatus.textContent=approved?'Approved':'Changes requested';notes.textContent=approved?'00':'03'}));
+      const slides=[
+        {src:'assets/b2h-invitation-hero-desktop.jpg',alt:'Desktop view of a personalized Back2Health invitation for the fictional recipient Nefeli',title:'Personalized welcome',copy:'One reusable invitation, safely personalized for a fictional recipient.'},
+        {src:'assets/b2h-invitation-mission-desktop.jpg',alt:'Back2Health invitation mission screen with five guided tasks and visible progress',title:'Guided mission',copy:'Five steps make the private pitch easier to enter and complete.'},
+        {src:'assets/b2h-invitation-products-desktop.jpg',alt:'Back2Health product carousel using official supplied Clinical Series photography',title:'Product discovery',copy:'Manual browsing keeps real supplied product media under the visitor’s control.'}
+      ];let slide=0;const image=document.querySelector('[data-b2h-image]'),count=document.querySelector('[data-b2h-count]'),title=document.querySelector('[data-b2h-title]'),copy=document.querySelector('[data-b2h-copy]');const render=()=>{const s=slides[slide];image.src=s.src;image.alt=s.alt;count.textContent=`${String(slide+1).padStart(2,'0')} / 03`;title.textContent=s.title;copy.textContent=s.copy};document.querySelector('[data-b2h-prev]').addEventListener('click',()=>{slide=(slide-1+slides.length)%slides.length;render()});document.querySelector('[data-b2h-next]').addEventListener('click',()=>{slide=(slide+1)%slides.length;render()});
+    })();
+  </script>
+</body>
+</html>
