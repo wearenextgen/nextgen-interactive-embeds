@@ -202,14 +202,19 @@
 <div id="ng-home-services-v1" class="ng-home-services" aria-labelledby="ng-home-services-title">
   <div class="ng-home-services__head">
     <div>
-      <p class="ng-home-services__eyebrow">EXPLORE THE STUDIO / 08 CAPABILITIES</p>
-      <h2 id="ng-home-services-title">PICK A SIGNAL.</h2>
+      <p class="ng-home-services__eyebrow">CHOOSE YOUR LANE / 08 CAPABILITIES</p>
+      <h2 id="ng-home-services-title">WHAT ARE YOU BUILDING?</h2>
     </div>
     <div class="ng-home-services__controls" aria-label="Service carousel controls">
       <button type="button" data-ng-services-prev aria-label="Show previous services">&larr;</button>
       <button type="button" data-ng-services-next aria-label="Show next services">&rarr;</button>
     </div>
   </div>
+
+  <nav class="ng-home-services__routes" aria-label="Choose the most relevant service path">
+    <a href="/web-design"><strong>BUSINESS SYSTEMS</strong><span>Websites, CRM, portals + automation</span><i aria-hidden="true">&#8599;</i></a>
+    <a href="/music"><strong>ARTIST WORLDS</strong><span>Releases, visuals, content + community</span><i aria-hidden="true">&#8599;</i></a>
+  </nav>
 
   <div class="ng-home-services__rail" data-ng-services-rail tabindex="0">
     <a class="ng-home-service" href="/web-design" style="--ng-sprite:url('https://images.squarespace-cdn.com/content/v1/644b8ec54119dd44d183a447/907aa4c2-f4dd-4c9f-869f-cfcc4345b3bc/sprite-web-v3-web.webp')">
@@ -269,6 +274,17 @@
   }
   #ng-home-services-v1 .ng-home-services__controls button:hover,
   #ng-home-services-v1 .ng-home-services__controls button:focus-visible { background:var(--ng-purple); box-shadow:0 0 28px rgba(129,21,255,.8); transform:translateY(-2px); }
+  #ng-home-services-v1 .ng-home-services__routes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0 0 .65rem; }
+  #ng-home-services-v1 .ng-home-services__routes a {
+    position:relative; min-height:52px; padding:9px 38px 9px 12px; display:flex; flex-wrap:wrap; align-content:center; gap:2px 8px;
+    border:1px solid rgba(255,255,255,.5); border-radius:14px; background:linear-gradient(120deg,rgba(255,255,255,.13),rgba(129,21,255,.2));
+    color:#fff; text-decoration:none; box-shadow:inset 0 1px 0 rgba(255,255,255,.32); transition:border-color .2s ease,background .2s ease,box-shadow .2s ease,transform .2s ease;
+  }
+  #ng-home-services-v1 .ng-home-services__routes a:hover,
+  #ng-home-services-v1 .ng-home-services__routes a:focus-visible { transform:translateY(-2px); border-color:#fff; background:linear-gradient(120deg,rgba(255,255,255,.18),rgba(129,21,255,.42)); box-shadow:0 0 24px rgba(129,21,255,.48); }
+  #ng-home-services-v1 .ng-home-services__routes strong { width:100%; font-family:var(--heading-font-font-family,"Alfarn",sans-serif); font-size:.9rem; line-height:1; }
+  #ng-home-services-v1 .ng-home-services__routes span { color:#e1d3f0; font-size:.7rem; line-height:1.15; }
+  #ng-home-services-v1 .ng-home-services__routes i { position:absolute; right:13px; top:50%; transform:translateY(-50%); font-style:normal; font-size:1rem; }
   #ng-home-services-v1 .ng-home-services__rail {
     display:grid; grid-auto-flow:column; grid-auto-columns:minmax(230px,1fr); gap:14px; overflow-x:auto; padding:5px 3px 15px;
     overscroll-behavior-inline:contain; scroll-snap-type:x mandatory; scrollbar-width:none; scroll-behavior:smooth;
@@ -304,16 +320,25 @@
     #ng-home-services-v1 .ng-home-service__sprite { width:min(100%,112px); }
     #ng-home-services-v1 .ng-home-service strong { font-size:1rem; }
     #ng-home-services-v1 .ng-home-service small { min-height:0; font-size:.72rem; }
+    #ng-home-services-v1 .ng-home-services__routes { margin-bottom:.55rem; }
+    #ng-home-services-v1 .ng-home-services__routes a { min-height:44px; padding-block:6px; }
   }
   @media (min-width:900px) { #ng-home-services-v1 .ng-home-services__rail { grid-auto-columns:calc((100% - 42px)/4); } }
   @media (max-width:640px) {
     #ng-home-services-v1 { width:92vw; }
+    #ng-home-services-v1::before { inset:-8px; }
     #ng-home-services-v1 .ng-home-services__head { align-items:center; }
     #ng-home-services-v1 h2 { font-size:2.15rem; }
     #ng-home-services-v1 .ng-home-services__eyebrow { font-size:.63rem; }
+    #ng-home-services-v1 .ng-home-services__head { margin-bottom:.45rem; }
+    #ng-home-services-v1 .ng-home-services__routes { gap:7px; margin-bottom:.45rem; }
+    #ng-home-services-v1 .ng-home-services__routes a { min-height:46px; padding:7px 28px 7px 9px; border-radius:12px; }
+    #ng-home-services-v1 .ng-home-services__routes strong { font-size:.78rem; }
+    #ng-home-services-v1 .ng-home-services__routes span { font-size:.61rem; }
+    #ng-home-services-v1 .ng-home-services__routes i { right:9px; }
     #ng-home-services-v1 .ng-home-services__rail { grid-auto-columns:78vw; }
-    #ng-home-services-v1 .ng-home-service { min-height:240px; padding:10px; }
-    #ng-home-services-v1 .ng-home-service__sprite { width:min(100%,140px); }
+    #ng-home-services-v1 .ng-home-service { min-height:205px; padding:10px; }
+    #ng-home-services-v1 .ng-home-service__sprite { width:min(100%,115px); }
     #ng-home-services-v1 .ng-home-service strong { font-size:1rem; }
     #ng-home-services-v1 .ng-home-service small { min-height:0; font-size:.72rem; }
   }
