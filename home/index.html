@@ -296,6 +296,15 @@
     0%,24%{background-position:0 0} 25%,49%{background-position:33.333% 0} 50%,74%{background-position:66.666% 0} 75%,100%{background-position:100% 0}
   }
   #ng-home-services-v1 :focus-visible { outline:3px solid #fff; outline-offset:3px; }
+  @media (min-width:641px) {
+    #ng-home-services-v1 .ng-home-services__head { margin-bottom:.55rem; }
+    #ng-home-services-v1 h2 { font-size:clamp(2rem,3.8vw,3.25rem); }
+    #ng-home-services-v1 .ng-home-services__controls button { width:44px; height:44px; }
+    #ng-home-services-v1 .ng-home-service { min-height:215px; padding:10px; }
+    #ng-home-services-v1 .ng-home-service__sprite { width:min(100%,112px); }
+    #ng-home-services-v1 .ng-home-service strong { font-size:1rem; }
+    #ng-home-services-v1 .ng-home-service small { min-height:0; font-size:.72rem; }
+  }
   @media (min-width:900px) { #ng-home-services-v1 .ng-home-services__rail { grid-auto-columns:calc((100% - 42px)/4); } }
   @media (max-width:640px) {
     #ng-home-services-v1 { width:92vw; }
