@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Next Gen Creative Systems — Selected Clients</title>
+<!-- This element is decoration + motion only. The Squarespace section that embeds
+     it owns the heading and the crawlable client links, so search engines never
+     depend on anything inside this iframe. -->
+<meta name="robots" content="noindex">
+<style>
+  /* Transparent throughout: the logos float directly on whatever the parent
+     Squarespace section background is, so this never shows a panel or card. */
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .rail {
+    --h: clamp(26px, 4.2vw, 44px);   /* optical logo height, fluid */
+    --gap: clamp(2rem, 6vw, 4.5rem);
+    --speed: 38s;
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    overflow: hidden;
+    /* fade the ends so logos enter and leave instead of popping at a hard edge */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+
+  .track {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    flex: 0 0 auto;
+    padding-left: var(--gap);
+    margin: 0;
+    list-style: none;
+    animation: roll var(--speed) linear infinite;
+    will-change: transform;
+  }
+
+  .rail:hover .track,
+  .rail:focus-within .track { animation-play-state: paused; }
+
+  .item { flex: 0 0 auto; }
+
+  .item a {
+    display: grid;
+    place-items: center;
+    /* a fixed box per logo is what stops wide wordmarks dwarfing square marks */
+    width: clamp(88px, 13vw, 150px);
+    height: var(--h);
+    opacity: .75;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+
+  .item a:hover,
+  .item a:focus-visible { opacity: 1; transform: translateY(-2px); }
+
+  .item a:focus-visible {
+    outline: 2px solid #8115ff;
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  .item img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* Squarish marks read smaller than wide wordmarks at the same box size,
+     so they get a little extra room to balance the row optically. */
+  .item.is-square a { width: clamp(58px, 8vw, 92px); }
+
+  @keyframes roll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track { animation: none; }
+    .rail { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+    .track[aria-hidden="true"] { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="rail" role="region" aria-label="Selected clients">
+  <ul class="track" id="track">
+    <li class="item"><a href="https://wearenextgen.io/bill-and-john-1" target="_top"><img src="logos/bill-and-john.png" alt="Bill and John" loading="eager" decoding="async"></a></li>
+    <li class="item"><a href="https://wearenextgen.io/hospitality" target="_top"><img src="logos/swell.png" alt="Swell"></a></li>
+    <li class="item is-square"><a href="https://wearenextgen.io/our-projects" target="_top"><img src="logos/creative-play.png" alt="Creative Play"></a></li>
+    <li class="item"><a href="https://wearenextgen.io/our-projects" target="_top"><img src="logos/new-cult.png" alt="New Cult"></a></li>
+    <li class="item is-square"><a href="https://wearenextgen.io/our-projects" target="_top"><img src="logos/underdog.png" alt="Underdog"></a></li>
+    <li class="item is-square"><a href="https://wearenextgen.io/tech-corporate" target="_top"><img src="logos/big-mouth-company.png" alt="Big Mouth Company"></a></li>
+    <li class="item is-square"><a href="https://wearenextgen.io/ivan-greko" target="_top"><img src="logos/ivan-greko.png" alt="Ivan Greko"></a></li>
+  </ul>
+  <ul class="track" id="mirror" aria-hidden="true"></ul>
+</div>
+
+<script>
+(function () {
+  var track  = document.getElementById('track');
+  var mirror = document.getElementById('mirror');
+
+  // A logo that fails to load hides its slot rather than leaving a gap or a
+  // broken-image icon. Blank cards are what made the previous breakage invisible.
+  track.querySelectorAll('img').forEach(function (img) {
+    img.addEventListener('error', function () {
+      var li = img.closest('.item');
+      if (li) li.remove();
+      console.warn('[clients] logo failed:', img.alt);
+      build();
+    });
+  });
+
+  // translateX(-50%) only loops seamlessly while the mirror exactly matches the
+  // source, so rebuild it whenever the source changes.
+  function build() {
+    mirror.innerHTML = track.innerHTML;
+    mirror.querySelectorAll('a').forEach(function (a) { a.setAttribute('tabindex', '-1'); });
+  }
+  build();
+
+  // Report our natural height so the Squarespace embed can size itself instead
+  // of relying on a hardcoded iframe height that breaks at other breakpoints.
+  function postHeight() {
+    var h = Math.ceil(document.querySelector('.rail').getBoundingClientRect().height);
+    if (window.parent !== window) {
+      window.parent.postMessage({ ngEmbed: 'clients', height: h }, '*');
+    }
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+}());
+</script>
+
+</body>
+</html>
