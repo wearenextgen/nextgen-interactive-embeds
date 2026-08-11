@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="demo-shim.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Enhance Photos — Next Gen Intern</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3a;
+  --text:#e0e0e8;--muted:#777;--accent:#E85D9A;--accent2:#9B2D8E;
+  --green:#00c853;--red:#ff1744;--orange:#ff9100;--blue:#448aff;--yellow:#ffd600}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2)));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.nav a:hover{color:var(--text);background:var(--surface2)}
+.wrap{max-width:1400px;margin:0 auto;padding:24px 22px}
+h1{font-size:22px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.btn{padding:8px 14px;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-success{background:var(--green);color:#000}
+.btn-danger{background:var(--red);color:#fff}
+
+.split{display:grid;grid-template-columns:1fr 1.2fr;gap:20px}
+@media (max-width:1100px){.split{grid-template-columns:1fr}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.card h2{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.photo-cell{position:relative;background:var(--surface2);border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;aspect-ratio:1;transition:all 0.15s}
+.photo-cell:hover{border-color:var(--accent)}
+.photo-cell.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,93,154,0.3)}
+.photo-cell img{width:100%;height:100%;object-fit:cover}
+.photo-src{position:absolute;top:3px;left:3px;font-size:8px;background:rgba(0,0,0,0.75);padding:2px 5px;border-radius:3px;color:#fff;text-transform:uppercase;font-weight:700}
+.source-label{font-size:11px;color:var(--muted);margin:10px 0 6px;text-transform:uppercase;letter-spacing:0.5px}
+
+.panel{display:none}
+.panel.open{display:block}
+.beforeafter{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.beforeafter img{width:100%;border-radius:6px;background:#000;min-height:200px;object-fit:contain}
+.ba-tag{font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;letter-spacing:0.5px}
+textarea{width:100%;min-height:180px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:ui-monospace,monospace;font-size:11px;resize:vertical;line-height:1.5}
+textarea:focus{outline:none;border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+select{padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px}
+.loading{padding:40px;text-align:center;color:var(--muted)}
+.loading-spin{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.saved-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.saved-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.saved-ba{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#000}
+.saved-ba img{width:100%;height:90px;object-fit:cover;display:block}
+.saved-meta{padding:6px 8px;font-size:10px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.empty{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;background:var(--surface2);color:var(--muted);margin-left:6px}
+.pill.ok{background:var(--green);color:#000}
+</style></head>
+<body>
+<div class="top">
+  <div class="logo">Next Gen Intern — Photo Enhancement</div>
+  <div class="nav">
+    <a href="/">Leads</a>
+    <a href="tasks.html">Tasks</a>
+    <a href="/campaigns">Campaigns</a>
+    <a href="/metrics">Metrics</a>
+  </div>
+</div>
+<div class="wrap">
+  <h1 id="title">Loading…</h1>
+  <div class="sub" id="subtitle"></div>
+
+  <div class="split">
+    <!-- LEFT: photo source gallery -->
+    <div>
+      <div class="card">
+        <h2>Photo sources <span class="pill" id="srcCount"></span></h2>
+        <div class="row">
+          <button class="btn btn-ghost btn-sm" onclick="scrapeWebsite()">↻ Scrape website photos</button>
+          <span class="pill" id="scrapeStatus"></span>
+        </div>
+        <div id="candidates"></div>
+      </div>
+
+      <div class="card">
+        <h2>Saved enhanced photos <span class="pill" id="savedCount"></span></h2>
+        <div id="saved"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: enhancement panel -->
+    <div>
+      <div class="card panel" id="enhPanel">
+        <h2>Nano Banana Pro enhancement</h2>
+        <div class="beforeafter">
+          <div><div class="ba-tag">Before (selected photo)</div><img id="imgBefore" src=""></div>
+          <div><div class="ba-tag">After (generated)</div><img id="imgAfter" src="" style="opacity:0.3"></div>
+        </div>
+        <div class="row">
+          <label style="font-size:11px;color:var(--muted)">Env</label>
+          <select id="envSel"><option>indoor</option><option>outdoor</option></select>
+          <label style="font-size:11px;color:var(--muted)">Light</label>
+          <select id="lightSel"><option>day</option><option>night</option></select>
+          <button class="btn btn-ghost btn-sm" onclick="reloadPrompt()">Load style prompt</button>
+        </div>
+        <textarea id="promptArea" placeholder="Prompt sent to Nano Banana Pro (editable before generate)"></textarea>
+        <div class="row" style="margin-top:10px">
+          <button class="btn btn-primary" onclick="runEnhance()" id="genBtn">Generate</button>
+          <button class="btn btn-ghost" onclick="closePanel()">Close</button>
+        </div>
+        <div id="enhStatus" style="font-size:11px;color:var(--muted);margin-top:8px"></div>
+      </div>
+
+      <div class="card" id="emptyPanel">
+        <div class="empty">Click a photo on the left to enhance with Nano Banana Pro.<br><br>The prompt auto-fills from our style guide (disposable-camera / paparazzi-glam). Edit it before generating if you want a different look.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LEAD_ID = window.location.pathname.split('/').pop();
+let currentPhoto = null;
+const esc = s => (s||'').toString().replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+async function loadLead() {
+  const leads = await fetch('/api/leads').then(r=>r.json());
+  const lead = leads.find(l => l.id == LEAD_ID);
+  if (!lead) { document.getElementById('title').textContent = 'Lead not found'; return; }
+  document.getElementById('title').textContent = lead.company;
+  document.getElementById('subtitle').innerHTML = `${esc(lead.category||'?')} · ${esc(lead.market||'?')} · score ${lead.score||'?'} · <a href="/#lead-${lead.id}" style="color:var(--accent)">Open in main dashboard →</a>`;
+}
+
+async function loadCandidates() {
+  const r = await fetch(`/api/leads/${LEAD_ID}/enhance-candidates`).then(r=>r.json());
+  const groups = {};
+  (r.candidates || []).forEach(p => {
+    if (p.url && p.url.includes('grid')) return; // skip IG/FB grid strips
+    (groups[p.source] ||= []).push(p);
+  });
+  const order = ['website','gbp','google_images','cse','ig-post','fb-post'];
+  let html = '';
+  for (const src of order) {
+    if (!groups[src]) continue;
+    html += `<div class="source-label">${src} (${groups[src].length})</div><div class="photo-grid">`;
+    for (const p of groups[src]) {
+      const thumb = p.url.startsWith('http') ? p.url : `/api/enhanced/image?path=${encodeURIComponent(p.url)}`;
+      html += `<div class="photo-cell" onclick='selectPhoto(${JSON.stringify(p.url)})'>
+                 <img src="${esc(thumb)}" loading="lazy" onerror="this.style.opacity=0.2">
+                 <span class="photo-src">${src}</span>
+               </div>`;
+    }
+    html += '</div>';
+  }
+  document.getElementById('candidates').innerHTML = html || '<div class="empty">No photos yet. Click "Scrape website photos" above to pull them in.</div>';
+  document.getElementById('srcCount').textContent = (r.candidates||[]).filter(p=>!p.url.includes('grid')).length + ' candidates';
+
+  // Enhanced list
+  const saved = r.enhanced || [];
+  document.getElementById('savedCount').textContent = saved.length;
+  if (!saved.length) {
+    document.getElementById('saved').innerHTML = '<div class="empty">None yet. Enhanced photos will be attached when you save to Gmail.</div>';
+  } else {
+    document.getElementById('saved').innerHTML = '<div class="saved-list">' + saved.map(s=>`
+      <div class="saved-item">
+        <div class="saved-ba">
+          <img src="/api/enhanced/image?path=${encodeURIComponent(s.original_path)}" loading="lazy">
+          <img src="/api/enhanced/image?path=${encodeURIComponent(s.enhanced_path)}" loading="lazy">
+        </div>
+        <div class="saved-meta">
+          <span>${esc(s.env||'')}/${esc(s.lighting||'')}</span>
+          <button class="btn btn-ghost btn-sm" onclick="delSaved(${s.id})">Remove</button>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+}
+
+async function reloadPrompt() {
+  const env = document.getElementById('envSel').value;
+  const light = document.getElementById('lightSel').value;
+  const r = await fetch(`/api/style-prompt?env=${env}&lighting=${light}`).then(r=>r.json());
+  document.getElementById('promptArea').value = r.prompt;
+}
+
+function selectPhoto(url) {
+  currentPhoto = url;
+  document.getElementById('enhPanel').classList.add('open');
+  document.getElementById('emptyPanel').style.display = 'none';
+  document.querySelectorAll('.photo-cell').forEach(el => el.classList.remove('selected'));
+  event.currentTarget?.classList.add('selected');
+  const displayUrl = url.startsWith('http') ? url : `/api/enhanced/image?path=${encodeURIComponent(url)}`;
+  document.getElementById('imgBefore').src = displayUrl;
+  document.getElementById('imgAfter').src = '';
+  document.getElementById('imgAfter').style.opacity = 0.3;
+  document.getElementById('enhStatus').textContent = '';
+  reloadPrompt();
+}
+
+function closePanel() {
+  document.getElementById('enhPanel').classList.remove('open');
+  document.getElementById('emptyPanel').style.display = 'block';
+}
+
+async function runEnhance() {
+  if (!currentPhoto) return;
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = 'Generating…';
+  document.getElementById('enhStatus').innerHTML = '<span class="loading-spin"></span> Nano Banana Pro is working… (20-60 sec)';
+  document.getElementById('imgAfter').style.opacity = 0.3;
+  try {
+    const body = {
+      photo_url: currentPhoto,
+      prompt: document.getElementById('promptArea').value,
+      env: document.getElementById('envSel').value,
+      lighting: document.getElementById('lightSel').value,
+    };
+    const r = await fetch(`/api/leads/${LEAD_ID}/enhance`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    if (r.after_url) {
+      document.getElementById('imgAfter').src = r.after_url;
+      document.getElementById('imgAfter').style.opacity = 1;
+      document.getElementById('enhStatus').innerHTML = `✓ saved as enhanced #${r.enhanced_id} — will auto-attach when you save to Gmail`;
+      loadCandidates();
+    } else {
+      document.getElementById('enhStatus').innerHTML = `<span style="color:var(--red)">Error: ${esc(r.detail||'unknown')}</span>`;
+    }
+  } catch (e) {
+    document.getElementById('enhStatus').innerHTML = `<span style="color:var(--red)">Error: ${esc(e.toString())}</span>`;
+  }
+  btn.disabled = false; btn.textContent = 'Generate';
+}
+
+async function delSaved(id) {
+  if (!confirm('Remove this enhanced photo?')) return;
+  await fetch(`/api/enhanced/${id}`, {method:'DELETE'});
+  loadCandidates();
+}
+
+async function scrapeWebsite() {
+  document.getElementById('scrapeStatus').textContent = 'scraping…';
+  const r = await fetch(`/api/leads/${LEAD_ID}/scrape-website-photos`).then(r=>r.json());
+  document.getElementById('scrapeStatus').textContent = r.ok ? '✓ done' : '⚠ error';
+  loadCandidates();
+}
+
+loadLead();
+loadCandidates();
+</script>
+</body></html>

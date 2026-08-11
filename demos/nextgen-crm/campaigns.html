@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="demo-shim.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campaigns — Next Gen Intern</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3a;
+  --text:#e0e0e8;--muted:#777;--accent:#E85D9A;--accent2:#9B2D8E;
+  --green:#00c853;--red:#ff1744;--orange:#ff9100;--blue:#448aff;--yellow:#ffd600}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.nav a:hover,.nav a.active{color:var(--text);background:var(--surface2)}
+.wrap{max-width:1200px;margin:0 auto;padding:28px 22px}
+h2{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:700}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:28px}
+.cat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.cat h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.cat-size{font-size:12px;color:var(--muted);margin-bottom:12px}
+.seasons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.season{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s}
+.season:hover{border-color:var(--accent)}
+.season.ready{border-color:var(--green)}
+.season-name{font-size:11px;font-weight:700;text-transform:capitalize;margin-bottom:4px}
+.season-stat{font-size:9px;color:var(--muted)}
+.season.ready .season-stat{color:var(--green)}
+.season.selected{background:var(--accent);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:20px;display:none}
+.panel.open{display:block}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.panel-title{font-size:18px;font-weight:800}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border)}
+.tab{padding:8px 16px;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent}
+.tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.email-preview{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:ui-monospace,monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;color:#ccc}
+.subj{background:var(--surface2);border-bottom:1px solid var(--border);padding:8px 12px;font-size:11px;color:var(--muted);margin:-16px -16px 12px}
+.subj b{color:var(--text);font-weight:700}
+.drop{margin:14px 0;background:var(--surface2);border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center}
+.drop.ok{border-color:var(--green)}
+.drop img{max-height:140px;border-radius:6px;margin-top:10px}
+.drop code{background:var(--bg);padding:4px 8px;border-radius:4px;font-size:11px;color:var(--accent)}
+.btns{display:flex;gap:8px;margin-top:16px}
+.btn{padding:10px 22px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-send{background:var(--green);color:#000}
+.recipients{max-height:260px;overflow-y:auto;background:var(--surface2);border-radius:8px;padding:10px;font-size:11px;line-height:1.7}
+.recipient{display:flex;justify-content:space-between;padding:4px 6px;border-radius:4px}
+.recipient:hover{background:var(--surface)}
+.warning{background:rgba(255,145,0,0.15);border:1px solid var(--orange);color:var(--orange);padding:10px;border-radius:6px;font-size:12px;margin-top:10px}
+</style></head>
+<body>
+<div class="top">
+  <div class="logo">Next Gen Intern — Campaigns</div>
+  <div class="nav">
+    <a href="./">Leads</a>
+    <a href="orphans.html">Orphans</a>
+    <a href="contacts.html">Contact Lists</a>
+    <a href="campaigns.html" class="active">Campaigns</a>
+  </div>
+</div>
+<div class="wrap">
+  <h2>Newsletter Campaigns</h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Pick a category and season, drop your seasonal graphic in the shown folder, then preview and send. Every email includes an unsubscribe link and physical address. Rate-limited to ~9/min (Gmail API).</p>
+  <div class="warning" style="margin:0 0 24px">Only independently confirmed newsletter opt-ins appear here. Public or researched lead emails stay in Contact Lists and are never added automatically.</div>
+  <div class="cats" id="cats"></div>
+</div>
+
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div class="panel-title" id="ptitle"></div>
+    <button class="btn btn-ghost" onclick="closePanel()">Close</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-n="1" onclick="selectEmail(1)">Email 1 — Day 0 warm intro</div>
+    <div class="tab" data-n="2" onclick="selectEmail(2)">Email 2 — Day 3 value</div>
+    <div class="tab" data-n="3" onclick="selectEmail(3)">Email 3 — Day 5 offer</div>
+    <div class="tab" data-n="4" onclick="selectEmail(4)">Email 4 — Day 8 last call</div>
+  </div>
+  <div id="emailPreview"></div>
+  <div class="drop" id="drop">
+    <div style="color:var(--muted);font-size:12px">Drop your seasonal graphic (PNG/JPG) into:</div>
+    <code id="graphicPath"></code>
+    <div id="graphicStatus" style="margin-top:8px"></div>
+  </div>
+  <div id="recipientsBlock"></div>
+  <div class="btns">
+    <button class="btn btn-ghost" onclick="preview()">Refresh Preview</button>
+    <button class="btn btn-ghost" onclick="send(true)">Dry Run (no emails)</button>
+    <button class="btn btn-send" onclick="send(false)" id="sendBtn">Send Campaign</button>
+  </div>
+  <div id="sendResult" style="margin-top:12px"></div>
+</div>
+
+<script>
+let current={category:null,season:null,email_n:1};
+const esc=s=>(s||'').toString().replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+async function loadCats(){
+  const cats=await fetch('/api/campaigns/categories').then(r=>r.json());
+  document.getElementById('cats').innerHTML=cats.map(c=>`
+    <div class="cat">
+      <h3>${esc(c.category)}</h3>
+      <div class="cat-size">${c.list_size} confirmed subscriber${c.list_size===1?'':'s'}</div>
+      <div class="seasons">
+        ${Object.entries(c.seasons).map(([s,info])=>`
+          <div class="season ${info.ready?'ready':''}" onclick="pickSeason('${c.category}','${s}')">
+            <div class="season-name">${s}</div>
+            <div class="season-stat">${info.templates}/4 ✉ · ${info.graphics} 🖼</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function pickSeason(cat,season){
+  current={category:cat,season:season,email_n:1};
+  document.getElementById('ptitle').textContent=`${cat} · ${season}`;
+  document.getElementById('panel').classList.add('open');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.n==='1'));
+  await preview();
+  await loadRecipients();
+  document.getElementById('panel').scrollIntoView({behavior:'smooth'});
+}
+
+function closePanel(){document.getElementById('panel').classList.remove('open')}
+
+async function selectEmail(n){
+  current.email_n=n;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.n==String(n)));
+  await preview();
+}
+
+async function preview(){
+  if(!current.category)return;
+  const r=await fetch(`/api/campaigns/preview?category=${current.category}&season=${current.season}&email_number=${current.email_n}`).then(r=>r.json());
+  document.getElementById('emailPreview').innerHTML=`
+    <div class="email-preview">
+      <div class="subj">Subject: <b>${esc(r.subject)}</b></div>
+      ${esc(r.body)}
+    </div>
+  `;
+  const path=`workspace/campaigns/${current.category}/${current.season}/graphics/`;
+  document.getElementById('graphicPath').textContent=path;
+  const drop=document.getElementById('drop');
+  if(r.graphic_exists){
+    drop.classList.add('ok');
+    document.getElementById('graphicStatus').innerHTML='<div style="color:var(--green);font-size:12px;font-weight:700">✓ Graphic detected — ready to send</div>';
+  }else{
+    drop.classList.remove('ok');
+    document.getElementById('graphicStatus').innerHTML='<div style="color:var(--orange);font-size:12px">No graphic yet — drop one in the folder above</div>';
+  }
+}
+
+async function loadRecipients(){
+  const r=await fetch(`/api/campaigns/list?category=${current.category}`).then(r=>r.json());
+  document.getElementById('recipientsBlock').innerHTML=`
+    <h2 style="margin-top:18px">Recipients (${r.length})</h2>
+    <div class="recipients">${r.map(x=>`<div class="recipient"><span>${esc(x.company)}</span><span style="color:var(--muted)">${esc(x.contact_email)}</span></div>`).join('')||'<div style="color:var(--muted);padding:20px;text-align:center">No confirmed newsletter subscribers for this category</div>'}</div>
+  `;
+}
+
+async function send(dryRun){
+  if(!current.category)return;
+  const btn=document.getElementById('sendBtn');btn.disabled=true;
+  const prevTxt=btn.textContent;btn.textContent='Sending...';
+  try{
+    const r=await fetch('/api/campaigns/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      category:current.category,season:current.season,email_number:current.email_n,dry_run:dryRun,
+    })}).then(r=>r.json());
+    document.getElementById('sendResult').innerHTML=dryRun
+      ? `<div class="warning">DRY RUN — would send to ${r.would_send_to}. Subject: ${esc(r.sample_subject)}</div>`
+      : `<div class="warning" style="border-color:var(--green);color:var(--green);background:rgba(0,200,83,0.15)">✓ Sent ${r.sent}/${r.attempted}. Campaign #${r.campaign_id}${r.errors&&r.errors.length?` · ${r.errors.length} errors`:''}</div>`;
+  }catch(e){
+    document.getElementById('sendResult').innerHTML=`<div class="warning" style="border-color:var(--red);color:var(--red)">Error: ${esc(e.toString())}</div>`;
+  }
+  btn.disabled=false;btn.textContent=prevTxt;
+}
+
+loadCats();
+</script>
+</body></html>

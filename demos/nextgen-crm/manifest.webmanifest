@@ -1,0 +1,16 @@
+{
+  "name": "Next Gen CRM",
+  "short_name": "Next Gen",
+  "description": "Next Gen Creative Systems — sales + production CRM",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4E6F4",
+  "theme_color": "#9B2D8E",
+  "icons": [
+    { "src": "/static/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/static/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/static/app-icon.png",  "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ]
+}

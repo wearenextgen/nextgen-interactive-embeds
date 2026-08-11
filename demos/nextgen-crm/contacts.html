@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="demo-shim.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact Lists — Next Gen Sales</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3a;
+  --text:#e0e0e8;--muted:#8c8c9c;--accent:#E85D9A;--accent2:#9B2D8E;
+  --green:#00c853;--red:#ff1744;--orange:#ff9100;--blue:#448aff}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px;
+  border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:5}
+.logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav{display:flex;gap:4px;flex-wrap:wrap}.nav a{color:var(--muted);text-decoration:none;font-size:13px;
+  padding:7px 11px;border-radius:7px}.nav a:hover,.nav a.active{color:var(--text);background:var(--surface2)}
+.wrap{max-width:1320px;margin:0 auto;padding:30px 22px 70px}
+.intro{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+h1{font-size:30px;line-height:1.1;margin:0 0 8px}.sub{color:var(--muted);font-size:14px;line-height:1.55;max-width:800px}
+.guardrail{background:rgba(68,138,255,.1);border:1px solid rgba(68,138,255,.45);border-radius:10px;
+  padding:12px 14px;color:var(--blue);font-size:12px;line-height:1.5;max-width:390px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;margin:22px 0}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px}
+.stat-num{font-size:27px;font-weight:800}.stat-label{font-size:11px;color:var(--muted);margin-top:3px;
+  text-transform:uppercase;letter-spacing:.07em}.green{color:var(--green)}.orange{color:var(--orange)}
+.blue{color:var(--blue)}.red{color:var(--red)}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{border:1px solid var(--border);background:var(--surface);
+  color:var(--muted);border-radius:8px;padding:9px 13px;font-weight:700;font-size:12px;cursor:pointer}
+.tab.active{background:var(--accent);border-color:var(--accent);color:white}
+.search{min-width:260px;border:1px solid var(--border);background:var(--surface);color:var(--text);
+  padding:10px 12px;border-radius:9px;outline:none}.search:focus{border-color:var(--accent)}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:940px}th,td{padding:12px 13px;text-align:left;
+  border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}th{position:sticky;top:0;
+  background:var(--surface2);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+tbody tr:last-child td{border-bottom:0}.company{font-weight:800;font-size:13px}.meta{color:var(--muted);font-size:11px;margin-top:4px}
+.email{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text);word-break:break-all}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;
+  white-space:nowrap}.badge-candidate{color:var(--green);background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.35)}
+.badge-review{color:var(--orange);background:rgba(255,145,0,.12);border:1px solid rgba(255,145,0,.35)}
+.badge-news{color:var(--blue);background:rgba(68,138,255,.12);border:1px solid rgba(68,138,255,.35)}
+.badge-stop{color:var(--red);background:rgba(255,23,68,.12);border:1px solid rgba(255,23,68,.35)}
+.reason{max-width:360px;color:var(--muted);line-height:1.45}.source{color:var(--accent);text-decoration:none;font-weight:700}
+.source:hover{text-decoration:underline}.empty{padding:56px 20px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--text);font-size:16px;margin-bottom:7px}.loading{padding:60px;text-align:center;color:var(--muted)}
+.error{padding:16px;border:1px solid var(--red);background:rgba(255,23,68,.1);color:var(--red);border-radius:10px}
+@media(max-width:900px){.intro{display:block}.guardrail{margin-top:14px;max-width:none}.stats{grid-template-columns:repeat(2,1fr)}
+  .controls{align-items:stretch;flex-direction:column}.search{width:100%;min-width:0}.top{align-items:flex-start;flex-direction:column}}
+@media(max-width:520px){.wrap{padding:22px 12px 60px}.top{padding:12px}.stats{grid-template-columns:1fr 1fr;gap:8px}
+  .stat{padding:12px}.stat-num{font-size:22px}h1{font-size:25px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">Next Gen Sales — Contact Lists</div>
+  <nav class="nav">
+    <a href="./">Leads</a>
+    <a href="contacts.html" class="active">Contact Lists</a>
+    <a href="campaigns.html">Newsletter Campaigns</a>
+  </nav>
+</header>
+<main class="wrap">
+  <section class="intro">
+    <div>
+      <h1>Emails we can review for contact</h1>
+      <div class="sub">When the local research agent finds an evidence-backed public business email, it is saved here automatically. Addresses found on the official business website are prioritized; uncertain or free-mail addresses are held for review.</div>
+    </div>
+    <div class="guardrail"><strong>Two separate lists:</strong> a public email can be an outreach candidate, but it is never a newsletter subscriber by default. Newsletter campaigns use confirmed opt-ins only.</div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><div class="stat-num green" id="candidateCount">—</div><div class="stat-label">Outreach candidates</div></div>
+    <div class="stat"><div class="stat-num orange" id="reviewCount">—</div><div class="stat-label">Needs manual review</div></div>
+    <div class="stat"><div class="stat-num blue" id="newsletterCount">—</div><div class="stat-label">Confirmed newsletter opt-ins</div></div>
+    <div class="stat"><div class="stat-num red" id="suppressedCount">—</div><div class="stat-label">Suppressed / do not contact</div></div>
+  </section>
+
+  <section class="controls">
+    <div class="tabs">
+      <button class="tab active" data-view="candidate">Outreach candidates</button>
+      <button class="tab" data-view="review">Needs review</button>
+      <button class="tab" data-view="newsletter">Newsletter subscribers</button>
+      <button class="tab" data-view="suppressed">Suppressed</button>
+    </div>
+    <input class="search" id="search" type="search" placeholder="Search company, email, market…" autocomplete="off">
+  </section>
+
+  <section class="table-wrap" id="content"><div class="loading">Loading contact lists…</div></section>
+</main>
+<script>
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let state={view:'candidate',query:'',candidates:[],subscribers:[]};
+
+async function getJSON(url){
+  const response=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  return response.json();
+}
+
+function statusBadge(item,view){
+  if(view==='suppressed') return '<span class="badge badge-stop">Do not contact</span>';
+  if(view==='newsletter') return '<span class="badge badge-news">Confirmed opt-in</span>';
+  if(item.contact_eligibility==='outreach_candidate') return '<span class="badge badge-candidate">Ready for outreach review</span>';
+  return '<span class="badge badge-review">Manual review required</span>';
+}
+
+function candidateRows(items,view){
+  return items.map(item=>`<tr>
+    <td><div class="company">${esc(item.company||'Unnamed business')}</div><div class="meta">${esc([item.category||item.industry,item.market].filter(Boolean).join(' · ')||'No category / market')}</div></td>
+    <td><div class="email">${esc(item.contact_email)}</div><div class="meta">Newsletter: ${esc(item.newsletter_status||'not subscribed')}</div></td>
+    <td>${statusBadge(item,view)}</td>
+    <td>${item.source_url?`<a class="source" href="${esc(item.source_url)}">View evidence</a><div class="meta">${esc(item.evidence_method||'public page')}${item.confidence!=null?` · ${Math.round(Number(item.confidence)*100)}%`:''}</div>`:'<span class="meta">Evidence unavailable</span>'}</td>
+    <td class="reason">${esc(item.contact_eligibility_reason||'Manual review required before contact.')}</td>
+  </tr>`).join('');
+}
+
+function subscriberRows(items){
+  return items.map(item=>`<tr>
+    <td><div class="company">${esc(item.company||'Unlinked subscriber')}</div><div class="meta">${esc([item.category,item.market].filter(Boolean).join(' · ')||'No category / market')}</div></td>
+    <td><div class="email">${esc(item.email)}</div></td>
+    <td>${statusBadge(item,'newsletter')}</td>
+    <td><span class="meta">${esc(item.consent_source||'Recorded opt-in')}</span><div class="meta">Confirmed ${esc(item.confirmed_at||item.consent_at||'date not recorded')}</div></td>
+    <td class="reason">Confirmed newsletter opt-in. Unsubscribe and suppression checks still apply at send time.</td>
+  </tr>`).join('');
+}
+
+function matches(item,q){
+  return !q || [item.company,item.contact_email,item.email,item.category,item.industry,item.market]
+    .some(v=>String(v||'').toLowerCase().includes(q));
+}
+
+function render(){
+  const q=state.query.trim().toLowerCase();
+  let items=[];let rows='';let emptyTitle='';let emptyText='';
+  if(state.view==='candidate'){
+    items=state.candidates.filter(x=>!x.suppressed&&x.contact_eligibility==='outreach_candidate'&&matches(x,q));
+    rows=candidateRows(items,'candidate');emptyTitle='No outreach candidates yet';
+    emptyText='Evidence-backed addresses found on official business websites will appear here automatically.';
+  }else if(state.view==='review'){
+    items=state.candidates.filter(x=>!x.suppressed&&x.contact_eligibility==='manual_review'&&matches(x,q));
+    rows=candidateRows(items,'review');emptyTitle='Nothing needs manual review';
+    emptyText='Uncertain sources and personal/free-mail domains will be held here.';
+  }else if(state.view==='newsletter'){
+    items=state.subscribers.filter(x=>x.status==='confirmed'&&matches(x,q));
+    rows=subscriberRows(items);emptyTitle='No confirmed newsletter subscribers';
+    emptyText='That is expected until someone independently opts in. Researched lead emails are not copied here.';
+  }else{
+    const suppressedCandidates=state.candidates.filter(x=>x.suppressed&&matches(x,q));
+    const suppressedSubscribers=state.subscribers.filter(x=>['unsubscribed','suppressed'].includes(x.status)&&matches(x,q))
+      .map(x=>({company:x.company,contact_email:x.email,category:x.category,market:x.market,
+        contact_eligibility:'suppressed',contact_eligibility_reason:`Newsletter status: ${x.status}.`,newsletter_status:x.status,suppressed:true}));
+    items=[...suppressedCandidates,...suppressedSubscribers];rows=candidateRows(items,'suppressed');
+    emptyTitle='Suppression list is empty';emptyText='Unsubscribes and explicit do-not-contact records will appear here.';
+  }
+  if(!items.length){
+    document.getElementById('content').innerHTML=`<div class="empty"><strong>${esc(emptyTitle)}</strong>${esc(q?'No rows match this search.':emptyText)}</div>`;
+    return;
+  }
+  document.getElementById('content').innerHTML=`<table><thead><tr><th>Business</th><th>Email</th><th>Status</th><th>Evidence / consent</th><th>Why it is here</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function load(){
+  try{
+    const [contacts,newsletter]=await Promise.all([
+      getJSON('/api/contact-candidates'),getJSON('/api/newsletter/subscribers')
+    ]);
+    state.candidates=contacts.candidates||[];state.subscribers=newsletter.subscribers||[];
+    document.getElementById('candidateCount').textContent=contacts.counts?.outreach_candidate||0;
+    document.getElementById('reviewCount').textContent=contacts.counts?.manual_review||0;
+    document.getElementById('newsletterCount').textContent=newsletter.counts?.confirmed||0;
+    document.getElementById('suppressedCount').textContent=(contacts.counts?.suppressed||0)+(newsletter.counts?.unsubscribed||0)+(newsletter.counts?.suppressed||0);
+    render();
+  }catch(error){
+    document.getElementById('content').innerHTML=`<div class="error">Could not load contact lists: ${esc(error.message)}</div>`;
+  }
+}
+
+document.querySelectorAll('.tab').forEach(button=>button.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  button.classList.add('active');state.view=button.dataset.view;render();
+}));
+document.getElementById('search').addEventListener('input',event=>{state.query=event.target.value;render()});
+load();
+</script>
+</body>
+</html>

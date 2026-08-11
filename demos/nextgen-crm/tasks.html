@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="demo-shim.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tasks — Next Gen Intern</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3a;
+  --text:#e0e0e8;--muted:#777;--accent:#E85D9A;--accent2:#9B2D8E;
+  --green:#00c853;--red:#ff1744;--orange:#ff9100;--blue:#448aff;--yellow:#ffd600}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding-bottom:60px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.nav a:hover,.nav a.active{color:var(--text);background:var(--surface2)}
+.wrap{max-width:900px;margin:0 auto;padding:28px 22px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+h1{font-size:22px}
+.count{color:var(--muted);font-size:13px}
+.btn{padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.task{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
+.task.urgent{border-left:4px solid var(--red)}
+.task.high{border-left:4px solid var(--orange)}
+.task.normal{border-left:4px solid var(--accent)}
+.task-icon{font-size:22px;flex-shrink:0}
+.task-body{flex:1}
+.task-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.task-desc{font-size:12px;color:#bbb;line-height:1.5}
+.task-meta{font-size:10px;color:var(--muted);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+.task-meta b{color:var(--text)}
+.task-actions{display:flex;flex-direction:column;gap:4px}
+.empty{padding:50px;text-align:center;color:var(--muted);background:var(--surface);border-radius:10px}
+.link{color:var(--accent);text-decoration:none}
+.link:hover{text-decoration:underline}
+.priority-tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:800;text-transform:uppercase;margin-right:8px}
+.priority-urgent{background:var(--red);color:#fff}
+.priority-high{background:var(--orange);color:#000}
+.priority-normal{background:var(--surface2);color:var(--muted)}
+</style></head>
+<body>
+<div class="top">
+  <div class="logo">Next Gen Intern — Your Tasks</div>
+  <div class="nav">
+    <a href="/">Leads</a>
+    <a href="/orphans">Orphans</a>
+    <a href="/campaigns">Campaigns</a>
+    <a href="/metrics">Metrics</a>
+    <a href="tasks.html" class="active">Tasks</a>
+  </div>
+</div>
+<div class="wrap">
+  <div class="bar">
+    <div><h1 id="h">Pending tasks</h1><div class="count" id="cnt"></div></div>
+    <div>
+      <button class="btn btn-ghost" onclick="reseed()">Refresh calendar</button>
+      <button class="btn btn-primary" onclick="sendDigest()">Send Telegram digest</button>
+    </div>
+  </div>
+  <div id="list"></div>
+</div>
+<script>
+const esc=s=>(s||'').toString().replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+async function load(){
+  const rows=await fetch('/api/tasks/pending').then(r=>r.json());
+  document.getElementById('cnt').textContent=`${rows.length} pending`;
+  const icon=k=>({photo_selection:'📸',campaign_graphic:'🎨',approval:'✅',fix_contact:'📮'}[k]||'📌');
+  document.getElementById('list').innerHTML=rows.length?rows.map(t=>`
+    <div class="task ${t.priority}">
+      <div class="task-icon">${icon(t.kind)}</div>
+      <div class="task-body">
+        <div class="task-title"><span class="priority-tag priority-${t.priority}">${t.priority}</span>${esc(t.title)}</div>
+        <div class="task-desc">${esc(t.description)}</div>
+        <div class="task-meta">
+          ${t.deadline?`<span>📅 deadline: <b>${t.deadline}</b></span>`:''}
+          ${t.lead_id?`<span>lead: <b>#${t.lead_id}</b></span>`:''}
+          ${t.campaign_slug?`<span>campaign: <b>${esc(t.campaign_slug)}</b></span>`:''}
+          ${t.link?`<a class="link" href="${esc(t.link)}">Open →</a>`:''}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="btn btn-primary" onclick="done(${t.id})">Done</button>
+        <button class="btn btn-ghost" onclick="snooze(${t.id})">Snooze</button>
+      </div>
+    </div>`).join(''):'<div class="empty">🎉 All caught up — no pending tasks.</div>';
+}
+async function done(id){await fetch('/api/tasks/'+id+'/done',{method:'POST'});load();}
+async function snooze(id){await fetch('/api/tasks/'+id+'/snooze',{method:'POST'});load();}
+async function reseed(){await fetch('/api/tasks/reseed',{method:'POST'});load();}
+async function sendDigest(){
+  const btn=event.target;btn.textContent='Sending...';btn.disabled=true;
+  const r=await fetch('/api/tasks/telegram-digest',{method:'POST'}).then(r=>r.json()).catch(e=>({error:e+''}));
+  btn.textContent=r.ok?`Sent ✓ (${r.task_count} tasks)`:'Failed';btn.disabled=false;
+  setTimeout(()=>{btn.textContent='Send Telegram digest';},2500);
+}
+load();
+setInterval(load,15000);
+</script>
+</body></html>

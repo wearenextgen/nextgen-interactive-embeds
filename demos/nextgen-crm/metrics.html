@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="demo-shim.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Metrics — Next Gen Intern</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3a;
+  --text:#e0e0e8;--muted:#777;--accent:#E85D9A;--accent2:#9B2D8E;
+  --green:#00c853;--red:#ff1744;--orange:#ff9100;--blue:#448aff;--yellow:#ffd600}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.nav a:hover,.nav a.active{color:var(--text);background:var(--surface2)}
+.wrap{max-width:1200px;margin:0 auto;padding:28px 22px}
+h2{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:24px 0 12px;font-weight:700}
+.funnel{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-bottom:24px}
+.fstep{background:var(--surface);padding:16px 12px;text-align:center;position:relative}
+.fstep:first-child{border-radius:10px 0 0 10px}
+.fstep:last-child{border-radius:0 10px 10px 0}
+.fnum{font-size:26px;font-weight:800;color:var(--accent)}
+.fnum.pos{color:var(--green)}
+.fnum.warn{color:var(--orange)}
+.flbl{font-size:10px;text-transform:uppercase;color:var(--muted);margin-top:4px;letter-spacing:0.5px}
+.fpct{font-size:10px;color:var(--accent);margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi-v{font-size:24px;font-weight:800;color:var(--text)}
+.kpi-v.accent{color:var(--accent)}
+.kpi-v.green{color:var(--green)}
+.kpi-l{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:3px;letter-spacing:0.5px}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:10px;overflow:hidden;margin-top:8px}
+th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+td{padding:10px 12px;border-top:1px solid var(--border);font-size:13px}
+td.num{text-align:right;font-family:ui-monospace,monospace;font-weight:600}
+.bar{background:var(--surface2);height:6px;border-radius:3px;overflow:hidden;margin-top:2px}
+.bar-fill{background:var(--accent);height:100%}
+.empty{padding:30px;text-align:center;color:var(--muted);background:var(--surface);border-radius:10px}
+.row-sys{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sys-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.sys-card h3{font-size:13px;margin-bottom:6px}
+</style></head>
+<body>
+<div class="top">
+  <div class="logo">Next Gen Intern — Metrics</div>
+  <div class="nav">
+    <a href="/">Leads</a>
+    <a href="/orphans">Orphans</a>
+    <a href="/campaigns">Campaigns</a>
+    <a href="/metrics" class="active">Metrics</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <h2>Outreach funnel</h2>
+  <div class="funnel" id="funnel"></div>
+
+  <h2>Revenue</h2>
+  <div class="kpis" id="revenue"></div>
+
+  <h2>Split by system</h2>
+  <div class="row-sys" id="bysystem"></div>
+
+  <h2>By vertical</h2>
+  <div id="byvertical"></div>
+</div>
+
+<script>
+async function load(){
+  const m=await fetch('/api/metrics').then(r=>r.json());
+  const f=m.funnel;
+  const steps=[
+    {n:f.total_leads,l:'Total leads'},
+    {n:f.drafts,l:'Drafts'},
+    {n:f.ready_to_send,l:'Ready to send'},
+    {n:f.sent,l:'Sent'},
+    {n:f.replied,l:'Replied',pos:true},
+    {n:f.positive_replies,l:'Positive',pos:true},
+    {n:f.meetings,l:'Meetings',pos:true},
+    {n:f.won,l:'Won',pos:true},
+  ];
+  document.getElementById('funnel').innerHTML=steps.map(s=>`
+    <div class="fstep">
+      <div class="fnum ${s.pos?'pos':''}">${s.n}</div>
+      <div class="flbl">${s.l}</div>
+    </div>`).join('');
+
+  document.getElementById('revenue').innerHTML=`
+    <div class="kpi"><div class="kpi-v green">€${f.revenue.toLocaleString()}</div><div class="kpi-l">Actual revenue</div></div>
+    <div class="kpi"><div class="kpi-v green">€${(f.pipeline_twelve_mo_high_eur||0).toLocaleString()}</div><div class="kpi-l">Pipeline potential (12mo high)</div></div>
+    <div class="kpi"><div class="kpi-v">€${(f.pipeline_one_time_high_eur||0).toLocaleString()}</div><div class="kpi-l">Pipeline potential (1st sale)</div></div>
+    <div class="kpi"><div class="kpi-v accent">${f.reply_rate_pct}%</div><div class="kpi-l">Reply rate</div></div>
+    <div class="kpi"><div class="kpi-v accent">${f.close_rate_pct}%</div><div class="kpi-l">Close rate</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--red)">${f.with_blocker||0}</div><div class="kpi-l">Leads blocked by issues</div></div>
+    <div class="kpi"><div class="kpi-v">${f.clean_leads||0}</div><div class="kpi-l">Leads no issues</div></div>
+  `;
+
+  document.getElementById('bysystem').innerHTML=`
+    <div class="sys-card">
+      <h3>System 1 — Personalized with 3 remade photos</h3>
+      <div class="kpi-v accent">${m.by_system.system1_personalized_sent}</div>
+      <div class="kpi-l">emails sent</div>
+    </div>
+    <div class="sys-card">
+      <h3>System 2 — Mass campaign</h3>
+      <div class="kpi-v accent">${m.by_system.system2_mass_campaign_sent}</div>
+      <div class="kpi-l">emails sent (${m.campaigns.campaigns_run} campaigns)</div>
+    </div>
+  `;
+
+  const maxTotal=Math.max(1,...m.by_vertical.map(v=>v.total));
+  document.getElementById('byvertical').innerHTML=m.by_vertical.length?`
+    <table>
+      <tr><th>Vertical</th><th>Leads</th><th>Drafts</th><th>Sent</th><th>Replied</th><th>Reply %</th><th>Won</th><th>Close %</th><th>Revenue</th></tr>
+      ${m.by_vertical.map(v=>`<tr>
+        <td>${v.c}</td>
+        <td class="num">${v.total}<div class="bar"><div class="bar-fill" style="width:${100*v.total/maxTotal}%"></div></div></td>
+        <td class="num">${v.drafts}</td>
+        <td class="num">${v.sent}</td>
+        <td class="num">${v.replied}</td>
+        <td class="num">${v.reply_rate}%</td>
+        <td class="num">${v.won}</td>
+        <td class="num">${v.close_rate}%</td>
+        <td class="num">€${v.revenue.toLocaleString()}</td>
+      </tr>`).join('')}
+    </table>
+  `:'<div class="empty">No vertical data yet</div>';
+}
+load();
+setInterval(load,30000);
+</script>
+</body></html>
