@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business portal screen</title>
+<meta name="robots" content="noindex">
+<!--
+  BUSINESS PORTAL — screen content only.
+
+  Sits behind the chrome shell's transparent aperture. Nothing here draws the
+  device; the shell is a separate WebP on top.
+
+  Aperture measured from the v3 concept: 1187 x 619 (1.918:1). Authored at that
+  exact size and scaled by the host, so proportions cannot drift.
+
+  Motion follows DIRECTION.md: lead enters a three-stage pipeline, a booking
+  confirms, a follow-up route connects, one line chart grows and holds. Slow
+  and precise — the brief asks for "expensive", which here means restraint:
+  one thing moves at a time and the layout never reflows.
+-->
+<style>
+  :root{
+    --ink:#0a0a0f; --panel:#14141c; --line:#24242f; --paper:#f3efe4;
+    --violet:#8115ff; --violet-lo:#a45cff; --dim:#7c7c8c; --ok:#3ecf8e;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:transparent;overflow:hidden}
+
+  /* authored at the true aperture size; the host scales the whole thing */
+  .vp{
+    width:1187px;height:619px;
+    transform-origin:top left;
+    background:linear-gradient(160deg,#0c0c13 0%,#101019 55%,#0b0b11 100%);
+    color:var(--paper);font-family:var(--sans);
+    display:flex;flex-direction:column;
+    padding:34px 40px;
+  }
+
+  .top{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+  .top .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+  .top b{font:600 15px/1 var(--sans);letter-spacing:.02em}
+  .top .rt{margin-left:auto;font:500 12px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
+
+  .grid{flex:1;display:grid;grid-template-columns:1.5fr 1fr;gap:34px;min-height:0}
+
+  /* ---- pipeline ---- */
+  .lbl{font:600 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
+
+  .stages{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative}
+  .stage{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 16px 18px;min-height:132px;position:relative;
+    transition:border-color .5s ease, background .5s ease;
+  }
+  .stage.hot{border-color:var(--violet);background:#171020}
+  .stage .n{font:600 10px/1 var(--mono);letter-spacing:.18em;color:var(--dim)}
+  .stage .t{font:600 14px/1.25 var(--sans);margin-top:9px}
+  .stage .c{font:500 12px/1 var(--mono);color:var(--dim);margin-top:8px}
+
+  /* the lead itself — one small object that physically travels the pipeline */
+  .lead{
+    position:absolute;top:64px;left:0;width:112px;
+    background:#1d1430;border:1px solid var(--violet);border-radius:8px;
+    padding:9px 11px;
+    box-shadow:0 8px 22px rgba(129,21,255,.34);
+    transition:transform 1.15s cubic-bezier(.65,.02,.28,1), opacity .4s ease;
+    opacity:0;
+  }
+  .lead .nm{font:600 11px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lead .sub{font:500 9px/1 var(--mono);color:var(--violet-lo);margin-top:4px;letter-spacing:.1em}
+
+  .act{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .act li{
+    display:flex;align-items:center;gap:12px;
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:11px 14px;opacity:0;transform:translateX(-6px);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .act li.on{opacity:1;transform:none}
+  .act .d{width:5px;height:5px;border-radius:50%;background:var(--violet-lo);flex:0 0 auto}
+  .act .w{flex:1;font:500 12px/1 var(--sans)}
+  .act .tm{font:500 11px/1 var(--mono);color:var(--dim)}
+
+  /* ---- booking + follow-up ---- */
+  .side{display:flex;flex-direction:column;gap:16px;min-height:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .booking{display:flex;align-items:center;gap:13px;transition:border-color .5s ease}
+  .booking.done{border-color:var(--ok)}
+  .booking .tick{
+    width:30px;height:30px;border-radius:50%;flex:0 0 auto;
+    border:1.5px solid var(--line);display:grid;place-items:center;
+    color:transparent;font-size:15px;
+    transition:border-color .45s ease,color .45s ease,background .45s ease;
+  }
+  .booking.done .tick{border-color:var(--ok);color:var(--ok);background:rgba(62,207,142,.12)}
+  .booking .txt .a{font:600 13px/1.2 var(--sans)}
+  .booking .txt .b{font:500 11px/1 var(--mono);color:var(--dim);margin-top:5px;letter-spacing:.08em}
+
+  .route{display:flex;align-items:center;gap:0;padding:15px 18px}
+  .route .node{
+    font:600 10px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;
+    color:var(--dim);white-space:nowrap;transition:color .45s ease;
+  }
+  .route .node.on{color:var(--paper)}
+  .route .wire{
+    flex:1;height:1px;margin:0 10px;background:var(--line);position:relative;overflow:hidden;
+  }
+  .route .wire::after{
+    content:"";position:absolute;inset:0;width:0;
+    background:linear-gradient(90deg,var(--violet),var(--violet-lo));
+    transition:width .85s cubic-bezier(.5,.05,.2,1);
+  }
+  .route .wire.on::after{width:100%}
+
+  /* ---- chart ---- */
+  .chart{display:flex;flex-direction:column;height:250px}
+  .chart .box{flex:1;position:relative;min-height:0;overflow:hidden}
+  svg{width:100%;height:100%;display:block;overflow:visible}
+  .gridline{stroke:var(--line);stroke-width:1}
+  .area{fill:url(#g);opacity:0;transition:opacity .8s ease .35s}
+  .area.on{opacity:1}
+  .line{
+    fill:none;stroke:var(--violet-lo);stroke-width:2.5;
+    stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+    transition:stroke-dashoffset 1.6s cubic-bezier(.45,.05,.25,1);
+  }
+  .line.on{stroke-dashoffset:0}
+  .cap{
+    width:7px;height:7px;fill:var(--violet-lo);opacity:0;
+    transition:opacity .3s ease 1.5s;
+    filter:drop-shadow(0 0 6px var(--violet-lo));
+  }
+  .cap.on{opacity:1}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="vp" id="vp">
+
+  <div class="top">
+    <span class="dot"></span>
+    <b>Operations</b>
+    <span class="rt">LIVE</span>
+  </div>
+
+  <div class="grid">
+    <div>
+      <p class="lbl">Pipeline</p>
+      <div class="stages" id="stages">
+        <div class="stage" data-s="0"><div class="n">01</div><div class="t">Enquiry</div><div class="c">3 open</div></div>
+        <div class="stage" data-s="1"><div class="n">02</div><div class="t">Qualified</div><div class="c">2 open</div></div>
+        <div class="stage" data-s="2"><div class="n">03</div><div class="t">Booked</div><div class="c" id="bookedCount">1 open</div></div>
+        <div class="lead" id="lead">
+          <div class="nm">Blue Harbour</div>
+          <div class="sub">NEW</div>
+        </div>
+      </div>
+
+      <p class="lbl" style="margin-top:30px">Recent activity</p>
+      <ul class="act" id="act">
+        <li><span class="d"></span><span class="w">Enquiry received</span><span class="tm">09:14</span></li>
+        <li><span class="d"></span><span class="w">Availability held</span><span class="tm">09:16</span></li>
+        <li><span class="d"></span><span class="w">Details captured</span><span class="tm">09:18</span></li>
+      </ul>
+    </div>
+
+    <div class="side">
+      <div class="card booking" id="booking">
+        <span class="tick">&#10003;</span>
+        <span class="txt">
+          <span class="a">Booking confirmed</span>
+          <span class="b" id="ref">&mdash;</span>
+        </span>
+      </div>
+
+      <div class="card route" id="route">
+        <span class="node on">Site</span>
+        <span class="wire" data-w="0"></span>
+        <span class="node" data-n="1">CRM</span>
+        <span class="wire" data-w="1"></span>
+        <span class="node" data-n="2">Follow&#8209;up</span>
+      </div>
+
+      <div class="card chart">
+        <p class="lbl" style="margin-bottom:12px">Bookings</p>
+        <div class="box">
+          <svg viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#8115ff" stop-opacity=".38"/>
+                <stop offset="100%" stop-color="#8115ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="gridline" x1="0" y1="30" x2="300" y2="30"/>
+            <line class="gridline" x1="0" y1="60" x2="300" y2="60"/>
+            <line class="gridline" x1="0" y1="90" x2="300" y2="90"/>
+            <path class="area" id="area" d=""/>
+            <path class="line" id="line" d=""/>
+            <circle class="cap" id="cap" cx="0" cy="0" r="3.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $=function(s){return document.querySelector(s);};
+
+  // scale the fixed-size viewport into whatever aperture the host gives us
+  function fit(){
+    var vp=$('#vp');
+    var k=Math.min(window.innerWidth/1187, window.innerHeight/619);
+    vp.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  // chart geometry — a calm rise that flattens, not a hockey stick
+  var pts=[[0,104],[43,96],[86,88],[129,74],[171,62],[214,44],[257,34],[300,28]];
+  var dLine='M'+pts.map(function(p){return p[0]+' '+p[1];}).join(' L');
+  var dArea=dLine+' L300 120 L0 120 Z';
+  var line=$('#line'), area=$('#area'), cap=$('#cap');
+  line.setAttribute('d',dLine); area.setAttribute('d',dArea);
+  var len=line.getTotalLength();
+  line.style.setProperty('--len',len);
+  cap.setAttribute('cx',pts[pts.length-1][0]); cap.setAttribute('cy',pts[pts.length-1][1]);
+
+  var stages=[].slice.call(document.querySelectorAll('.stage'));
+  var lead=$('#lead'), booking=$('#booking'), refEl=$('#ref');
+  var wires=[].slice.call(document.querySelectorAll('.wire'));
+  var nodes=[].slice.call(document.querySelectorAll('.node[data-n]'));
+
+  function reset(){
+    lead.style.opacity=0; lead.style.transform='translateX(0)';
+    stages.forEach(function(s){s.classList.remove('hot');});
+    booking.classList.remove('done'); refEl.textContent='—';
+    wires.forEach(function(w){w.classList.remove('on');});
+    nodes.forEach(function(n){n.classList.remove('on');});
+    line.classList.remove('on'); area.classList.remove('on'); cap.classList.remove('on');
+    $('#bookedCount').textContent='1 open';
+  }
+
+  // one step at a time; nothing overlaps, which is what makes it read as precise
+  function run(){
+    var w = stages[0].getBoundingClientRect().width;
+    var gap = 14;
+    var t=[];
+    function at(ms,fn){ t.push(setTimeout(fn,ms)); }
+
+    reset();
+    var acts=[].slice.call(document.querySelectorAll('.act li'));
+    acts.forEach(function(a){a.classList.remove('on');});
+    at(400,  function(){ lead.style.opacity=1; stages[0].classList.add('hot'); acts[0].classList.add('on'); });
+    at(1600, function(){ stages[0].classList.remove('hot'); stages[1].classList.add('hot');
+                         lead.style.transform='translateX('+(w+gap)+'px)';
+                         lead.querySelector('.sub').textContent='QUALIFIED'; acts[1].classList.add('on'); });
+    at(3000, function(){ stages[1].classList.remove('hot'); stages[2].classList.add('hot');
+                         lead.style.transform='translateX('+((w+gap)*2)+'px)';
+                         lead.querySelector('.sub').textContent='BOOKED'; acts[2].classList.add('on'); });
+    at(4100, function(){ booking.classList.add('done');
+                         refEl.textContent='BH-'+(1000+Math.floor(Math.random()*9000));
+                         $('#bookedCount').textContent='2 open'; });
+    at(4900, function(){ wires[0].classList.add('on'); nodes[0].classList.add('on'); });
+    at(5700, function(){ wires[1].classList.add('on'); nodes[1].classList.add('on'); });
+    at(6400, function(){ line.classList.add('on'); area.classList.add('on'); cap.classList.add('on'); });
+    at(11500,function(){ t.forEach(clearTimeout); run(); });   // hold, then repeat
+  }
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    // static end-state rather than a frozen mid-animation
+    lead.style.opacity=1; stages[2].classList.add('hot');
+    [].slice.call(document.querySelectorAll('.act li')).forEach(function(a){a.classList.add('on');});
+    booking.classList.add('done'); refEl.textContent='BH-4820';
+    wires.forEach(function(w){w.classList.add('on');});
+    nodes.forEach(function(n){n.classList.add('on');});
+    line.classList.add('on'); area.classList.add('on'); cap.classList.add('on');
+  } else {
+    run();
+  }
+}());
+</script>
+</body>
+</html>
