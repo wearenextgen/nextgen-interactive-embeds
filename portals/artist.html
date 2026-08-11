@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artist portal screen</title>
+<meta name="robots" content="noindex">
+<!--
+  ARTIST PORTAL — screen content only.
+
+  Sits behind the translucent rainbow shell's transparent aperture. Nothing
+  here draws the computer; the shell is a separate WebP on top.
+
+  Aperture measured from the v3 concept: 1052 x 1002 (1.05:1) — nearly square,
+  which is why this is a stacked DAW layout rather than the wide arrangement
+  a normal editor would use.
+
+  Motion follows DIRECTION.md exactly: four coloured clips on fixed lanes, a
+  playhead crossing, waveforms animating INSIDE fixed clip geometry, mixer
+  meters rising and falling, one loop region changing colour and holding.
+
+  The clip rectangles never move or resize — only the waveform bars inside
+  them animate. That constraint is what keeps it reading as a real arrangement
+  view instead of a decorative equaliser.
+-->
+<style>
+  :root{
+    --bg1:#171029; --bg2:#0f0a1c;
+    --line:rgba(255,255,255,.10);
+    --paper:#f6f2ff; --dim:#9a8fb8;
+    --c1:#ff5fa2;  /* vocals  */
+    --c2:#38d9d0;  /* drums   */
+    --c3:#ffc247;  /* bass    */
+    --c4:#9b6bff;  /* synth   */
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:transparent;overflow:hidden}
+
+  .vp{
+    width:1052px;height:1002px;
+    transform-origin:top left;
+    background:linear-gradient(165deg,var(--bg1) 0%,var(--bg2) 60%,#0c0818 100%);
+    color:var(--paper);font-family:var(--sans);
+    display:flex;flex-direction:column;
+    padding:38px 40px 34px;
+  }
+
+  .bar{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+  .bar .rec{width:11px;height:11px;border-radius:50%;background:var(--c1);box-shadow:0 0 12px var(--c1)}
+  .bar b{font:600 19px/1 var(--sans);letter-spacing:.01em}
+  .bar .bpm{margin-left:auto;font:600 13px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
+
+  .ruler{display:flex;margin-left:132px;margin-bottom:9px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  .ruler span{flex:1;font:600 11px/1 var(--mono);color:var(--dim);letter-spacing:.1em}
+
+  .arrange{position:relative;flex:0 0 auto}
+
+  .lane{display:flex;align-items:center;height:128px;gap:0}
+  .lane + .lane{margin-top:16px}
+
+  .head{
+    width:132px;flex:0 0 auto;padding-right:16px;
+  }
+  .head .nm{font:600 14px/1 var(--sans)}
+  .head .io{display:flex;gap:6px;margin-top:9px}
+  .head .io i{
+    font:600 9px/1 var(--mono);font-style:normal;letter-spacing:.08em;
+    padding:4px 6px;border:1px solid var(--line);border-radius:4px;color:var(--dim);
+  }
+
+  .track{
+    flex:1;height:100%;position:relative;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--line);border-radius:9px;overflow:hidden;
+  }
+
+  /* Clip geometry is fixed. Only the bars inside it move. */
+  .clip{
+    position:absolute;top:9px;bottom:9px;border-radius:7px;
+    display:flex;align-items:center;gap:2px;
+    padding:0 9px;overflow:hidden;
+    background:var(--clip-bg);border:1px solid var(--clip-br);
+  }
+  .clip .b{
+    flex:1;min-width:2px;border-radius:1px;
+    background:var(--clip-fg);
+    height:12%;
+    transition:height .16s linear;
+  }
+
+  /* one loop region that changes colour and holds */
+  .loop{
+    position:absolute;top:0;bottom:0;border-radius:9px;
+    border:1.5px dashed rgba(255,255,255,.22);
+    background:rgba(255,255,255,.03);
+    transition:border-color .6s ease, background .6s ease;
+    pointer-events:none;
+  }
+  .loop.on{
+    border-color:var(--c2);
+    background:rgba(56,217,208,.11);
+  }
+
+  .play{
+    position:absolute;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,#fff,rgba(255,255,255,.35));
+    box-shadow:0 0 12px rgba(255,255,255,.6);
+    left:0;pointer-events:none;
+  }
+
+  /* ---- mixer ---- */
+  .mix{margin-top:38px;display:flex;gap:16px;align-items:flex-end;flex:1;min-height:0}
+  .ch{flex:1;display:flex;flex-direction:column;align-items:center;gap:11px;height:100%}
+  .meter{
+    width:100%;flex:1;min-height:0;border-radius:8px;
+    background:rgba(255,255,255,.05);border:1px solid var(--line);
+    display:flex;align-items:flex-end;overflow:hidden;
+  }
+  .meter i{
+    display:block;width:100%;height:8%;
+    background:linear-gradient(180deg,var(--m),rgba(255,255,255,.12));
+    transition:height .18s ease-out;
+  }
+  .ch .cl{font:600 11px/1 var(--mono);letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+    .play{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="vp" id="vp">
+
+  <div class="bar">
+    <span class="rec"></span>
+    <b>Arrangement</b>
+    <span class="bpm">124 BPM &nbsp;/&nbsp; 4&#8203;/4</span>
+  </div>
+
+  <div class="ruler"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+
+  <div class="arrange" id="arrange">
+    <div class="lane">
+      <div class="head"><div class="nm">Vocals</div><div class="io"><i>M</i><i>S</i><i>REC</i></div></div>
+      <div class="track"><div class="clip" data-c="1" style="left:6%;width:40%;--clip-bg:rgba(255,95,162,.18);--clip-br:rgba(255,95,162,.55);--clip-fg:#ff5fa2"></div></div>
+    </div>
+    <div class="lane">
+      <div class="head"><div class="nm">Drums</div><div class="io"><i>M</i><i>S</i><i>REC</i></div></div>
+      <div class="track"><div class="clip" data-c="2" style="left:2%;width:76%;--clip-bg:rgba(56,217,208,.16);--clip-br:rgba(56,217,208,.5);--clip-fg:#38d9d0"></div></div>
+    </div>
+    <div class="lane">
+      <div class="head"><div class="nm">Bass</div><div class="io"><i>M</i><i>S</i><i>REC</i></div></div>
+      <div class="track"><div class="clip" data-c="3" style="left:14%;width:52%;--clip-bg:rgba(255,194,71,.16);--clip-br:rgba(255,194,71,.5);--clip-fg:#ffc247"></div></div>
+    </div>
+    <div class="lane">
+      <div class="head"><div class="nm">Synth</div><div class="io"><i>M</i><i>S</i><i>REC</i></div></div>
+      <div class="track">
+        <div class="clip" data-c="4" style="left:38%;width:56%;--clip-bg:rgba(155,107,255,.18);--clip-br:rgba(155,107,255,.55);--clip-fg:#9b6bff"></div>
+      </div>
+    </div>
+
+    <div class="loop" id="loop" style="left:calc(132px + 38%);width:34%"></div>
+    <div class="play" id="play" style="left:132px"></div>
+  </div>
+
+  <div class="mix">
+    <div class="ch"><div class="meter"><i style="--m:#ff5fa2" data-m="1"></i></div><div class="cl">Vox</div></div>
+    <div class="ch"><div class="meter"><i style="--m:#38d9d0" data-m="2"></i></div><div class="cl">Drm</div></div>
+    <div class="ch"><div class="meter"><i style="--m:#ffc247" data-m="3"></i></div><div class="cl">Bass</div></div>
+    <div class="ch"><div class="meter"><i style="--m:#9b6bff" data-m="4"></i></div><div class="cl">Syn</div></div>
+    <div class="ch"><div class="meter"><i style="--m:#c9a6ff" data-m="0"></i></div><div class="cl">Mix</div></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fit(){
+    var vp=document.getElementById('vp');
+    var k=Math.min(window.innerWidth/1052, window.innerHeight/1002);
+    vp.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  // Build the waveform bars once. Bar COUNT and clip geometry stay fixed for
+  // the whole loop — only bar heights change, per the direction.
+  var clips=[].slice.call(document.querySelectorAll('.clip'));
+  clips.forEach(function(c){
+    var n=Math.max(10, Math.round(c.offsetWidth/7));
+    var frag=document.createDocumentFragment();
+    for(var i=0;i<n;i++){ var b=document.createElement('span'); b.className='b'; frag.appendChild(b); }
+    c.appendChild(frag);
+    // a stable per-clip shape so each track keeps its own character
+    c._seed = Math.random()*1000;
+  });
+
+  var meters=[].slice.call(document.querySelectorAll('.meter i'));
+  var play=document.getElementById('play');
+  var loop=document.getElementById('loop');
+  var arrange=document.getElementById('arrange');
+
+  if (reduce){
+    clips.forEach(function(c){
+      [].slice.call(c.children).forEach(function(b,i){
+        b.style.height = (30 + Math.abs(Math.sin(i*0.7+c._seed))*54) + '%';
+      });
+    });
+    meters.forEach(function(m,i){ m.style.height=(34+i*9)+'%'; });
+    loop.classList.add('on');
+    return;
+  }
+
+  var HEAD=132, t0=null, DUR=7200;
+
+  function frame(ts){
+    if(t0===null) t0=ts;
+    var p=((ts-t0)%DUR)/DUR;                     // 0..1 across the timeline
+    var trackW=arrange.clientWidth-HEAD;
+    play.style.left=(HEAD+p*trackW)+'px';
+
+    // waveform: only bars under the playhead are "sounding"
+    clips.forEach(function(c){
+      var cl=c.getBoundingClientRect(), tr=c.parentNode.getBoundingClientRect();
+      var start=(cl.left-tr.left)/tr.width, end=start+cl.width/tr.width;
+      var active = p>=start && p<=end;
+      var bars=c.children;
+      for(var i=0;i<bars.length;i++){
+        var base = 30 + Math.abs(Math.sin(i*0.55 + c._seed))*54;
+        var h = active ? base*(0.74+0.26*Math.abs(Math.sin(ts/150 + i*0.4 + c._seed))) : base*0.62;
+        bars[i].style.height = h.toFixed(1)+'%';
+      }
+      // mixer follows whether that clip is currently playing
+      var m=meters[clips.indexOf(c)];
+      if(m) m.style.height=(active ? 34+Math.abs(Math.sin(ts/170+c._seed))*56 : 14).toFixed(1)+'%';
+    });
+
+    // master meter
+    meters[4].style.height=(26+Math.abs(Math.sin(ts/190))*46).toFixed(1)+'%';
+
+    // loop region lights when the playhead is inside it, then holds
+    loop.classList.toggle('on', p>0.38 && p<0.72);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}());
+</script>
+</body>
+</html>
