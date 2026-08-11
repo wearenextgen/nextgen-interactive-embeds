@@ -1,0 +1,19 @@
+{
+  "file": "home-business-portal-v2-frame.webp",
+  "width": 900,
+  "height": 720,
+  "screen": {
+    "x": 193,
+    "y": 159,
+    "w": 511,
+    "h": 264,
+    "radius": 18
+  },
+  "motion": [
+    "pipeline-card-cycle",
+    "chart-line-grow",
+    "booking-date-pulse",
+    "status-light-sequence"
+  ],
+  "animationMethod": "live HTML/CSS/SVG behind static frame; no generated screen frames"
+}

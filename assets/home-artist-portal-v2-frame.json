@@ -1,0 +1,19 @@
+{
+  "file": "home-artist-portal-v2-frame.webp",
+  "width": 820,
+  "height": 900,
+  "screen": {
+    "x": 226,
+    "y": 205,
+    "w": 367,
+    "h": 377,
+    "radius": 44
+  },
+  "motion": [
+    "cover-carousel",
+    "waveform-playhead",
+    "equalizer-bars",
+    "stage-light-sweep"
+  ],
+  "animationMethod": "live HTML/CSS/SVG behind static frame; no generated screen frames"
+}
