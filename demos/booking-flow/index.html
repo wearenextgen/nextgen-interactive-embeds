@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Next Gen — Booking Flow: Guest and Control Centre</title>
+<meta name="robots" content="noindex">
+<!--
+  BOOKING FLOW DEMO — two screens, one system, one file.
+
+  Left (phone): what a guest does.  Right (monitor): what the operator sees.
+  Every guest action pushes a live event to the control centre. Showing both
+  halves at once is the argument: either half alone is just a form, or just a
+  dashboard.
+
+  LAYOUT NOTE — this is the part that matters:
+  Each screen is rendered at its TRUE logical viewport (390x844 for the phone,
+  1280x800 for the monitor) and then scaled to fit its frame. Styling a small
+  box with desktop CSS produces shrunken desktop, not a mobile layout; building
+  at 390px means the phone genuinely uses phone layout, phone type sizes and
+  phone touch targets, and only the final pixels are scaled.
+
+  NOTHING IS REAL. No payment is processed, no data leaves the page, no storage
+  is written. The card fields are readonly with fixed placeholder digits, so a
+  visitor cannot type a real card number into a demo.
+
+  Device art: frames are CSS today. When Codex's single frame image lands, set
+  its two apertures from the sidecar JSON and position .stack over them.
+-->
+<style>
+  :root{
+    --ink:#07070a; --panel:#101017; --line:#26262f; --paper:#f3efe4;
+    --violet:#8115ff; --violet-lo:#a45cff; --dim:#8b8b9c;
+    --ok:#3ecf8e; --warn:#e0a33a;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:transparent;font-family:var(--sans);color:var(--paper)}
+
+  .stage{
+    display:flex;align-items:flex-end;justify-content:center;
+    gap:clamp(16px,3.5vw,54px);
+    padding:clamp(10px,2vw,20px);
+    max-width:1200px;margin:0 auto;
+  }
+
+  /* Each device is sized by HEIGHT; width follows from the screen ratio.
+     Keeping both to one height is what makes them sit together properly. */
+  .dev{--h:430px;position:relative;flex:0 0 auto}
+  .dev .frame{position:relative;background:#1b1b23;box-shadow:0 0 0 1px #2e2e3a,0 26px 64px rgba(0,0,0,.62),0 0 44px rgba(129,21,255,.13)}
+  .dev .screen{position:relative;overflow:hidden;background:#0b0b11}
+
+  /* the scaled viewport */
+  .stack{position:absolute;top:0;left:0;transform-origin:top left}
+
+  .phone .frame{padding:8px;border-radius:26px}
+  .phone .screen{border-radius:19px;height:var(--h);width:calc(var(--h) * (390/844))}
+  .mon .frame{padding:10px;border-radius:11px}
+  .mon .screen{border-radius:4px;height:var(--h);width:calc(var(--h) * (1280/800))}
+  .stand2{width:44%;height:7px;background:#20202a;margin:0 auto;border-radius:0 0 3px 3px}
+  .stand{width:24%;height:11px;background:#1b1b23;margin:0 auto;border-radius:0 0 4px 4px}
+
+  .cap{font:600 9px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;margin:10px 0 0}
+
+  /* Stack the two devices on narrow screens; the phone keeps its real layout. */
+  @media (max-width:780px){
+    .stage{flex-direction:column;align-items:center}
+    .dev{--h:380px}
+    .mon{--h:300px}
+  }
+
+  /* ============ shared screen furniture ============ */
+  .scr{display:flex;flex-direction:column;height:100%;width:100%}
+  .bar{display:flex;align-items:center;gap:8px;flex:0 0 auto;border-bottom:1px solid var(--line);background:#0e0e15}
+  .body{flex:1;overflow:auto}
+
+  /* ============ PHONE — laid out at 390x844 ============ */
+  .p-vp{width:390px;height:844px;display:flex;flex-direction:column}
+  .p-vp .bar{padding:16px 18px}
+  .p-vp .bar b{font:700 17px/1 var(--sans)}
+  .p-vp .bar .sp{margin-left:auto;font:600 11px/1 var(--mono);color:var(--dim);letter-spacing:.14em}
+  .p-vp .body{padding:20px 18px 26px}
+
+  .step{display:none}
+  .step.on{display:block;animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .p-vp h2{font:700 26px/1.15 var(--sans);margin:0 0 6px;letter-spacing:-.02em}
+  .p-vp .sub{font:400 15px/1.45 var(--sans);color:var(--dim);margin:0 0 22px}
+
+  /* 60px tall rows — a real touch target, not a desktop list item */
+  .opt{
+    display:flex;gap:14px;align-items:center;width:100%;text-align:left;
+    padding:16px;margin-bottom:12px;min-height:74px;
+    background:#14141c;border:1.5px solid var(--line);border-radius:14px;
+    color:inherit;font:inherit;cursor:pointer;
+    transition:border-color .15s,background .15s;
+  }
+  .opt:active{transform:scale(.985)}
+  .opt.sel{border-color:var(--violet);background:#1b1226}
+  .opt .em{font-size:28px;line-height:1}
+  .opt .t{display:block;font:600 16px/1.25 var(--sans);margin-bottom:3px}
+  .opt .d{display:block;font:400 13px/1.3 var(--sans);color:var(--dim)}
+
+  .grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:22px}
+  .grid7 .dn{font:600 11px/1 var(--mono);color:var(--dim);text-align:center;padding-bottom:6px}
+  .day{
+    aspect-ratio:1;display:grid;place-items:center;border-radius:10px;
+    background:#14141c;border:1.5px solid transparent;cursor:pointer;
+    font:600 15px/1 var(--mono);color:var(--paper);
+  }
+  .day.off{opacity:.22;pointer-events:none}
+  .day.sel{background:var(--violet);border-color:var(--violet)}
+
+  .fld{margin-bottom:16px}
+  .fld label{display:block;font:600 11px/1 var(--mono);letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:8px}
+  .fld input{
+    width:100%;padding:15px 14px;background:#14141c;border:1.5px solid var(--line);
+    border-radius:11px;color:var(--paper);font:400 16px/1 var(--sans);
+  }
+  .fld input:focus{outline:none;border-color:var(--violet)}
+  .fld input[readonly]{color:var(--dim)}
+
+  /* 54px CTA — thumb-sized */
+  .cta{
+    width:100%;min-height:54px;padding:16px;margin-top:8px;border:0;border-radius:12px;
+    background:var(--violet);color:#fff;cursor:pointer;
+    font:700 15px/1 var(--sans);letter-spacing:.03em;
+  }
+  .cta[disabled]{opacity:.35;cursor:not-allowed}
+  .ghost{background:transparent;border:1.5px solid var(--line);color:var(--dim)}
+
+  .fake{
+    display:flex;gap:10px;align-items:center;padding:13px 14px;margin-bottom:18px;
+    border:1.5px dashed var(--warn);border-radius:11px;
+    font:600 12px/1.35 var(--sans);color:var(--warn);
+  }
+
+  .done{text-align:center;padding:40px 10px}
+  .done .tick{
+    width:82px;height:82px;margin:0 auto 22px;border-radius:50%;
+    background:rgba(62,207,142,.12);border:2px solid var(--ok);
+    display:grid;place-items:center;color:var(--ok);font-size:38px;
+    animation:pop .42s cubic-bezier(.2,1.4,.4,1);
+  }
+  @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .ref{font:600 13px/1 var(--mono);color:var(--dim);letter-spacing:.12em;margin-top:16px}
+
+  /* ============ MONITOR — laid out at 1280x800 ============ */
+  .m-vp{width:1280px;height:800px;display:flex;flex-direction:column}
+  .m-vp .bar{padding:14px 20px}
+  .m-vp .bar b{font:700 15px/1 var(--sans)}
+  .m-vp .bar .sp{margin-left:auto;font:600 11px/1 var(--mono);color:var(--dim);letter-spacing:.14em}
+  .m-vp .body{padding:20px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .kpi{background:#14141c;border:1px solid var(--line);border-radius:11px;padding:16px 18px}
+  .kpi b{display:block;font:700 34px/1 var(--sans);font-variant-numeric:tabular-nums;transition:color .3s}
+  .kpi b.hot{color:var(--violet-lo)}
+  .kpi span{font:600 11px/1 var(--mono);letter-spacing:.15em;color:var(--dim);text-transform:uppercase}
+
+  .lane{font:600 11px/1 var(--mono);letter-spacing:.16em;color:var(--dim);text-transform:uppercase;margin:0 0 12px}
+  .feed{display:flex;flex-direction:column;gap:10px}
+  .ev{
+    display:flex;gap:14px;align-items:flex-start;padding:15px 17px;
+    background:#14141c;border:1px solid var(--line);border-left:3px solid var(--dim);
+    border-radius:10px;animation:slide .32s ease;
+  }
+  @keyframes slide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+  .ev.new{border-left-color:var(--violet)}
+  .ev.win{border-left-color:var(--ok)}
+  .ev .ic{font-size:20px;line-height:1.1}
+  .ev .tx{flex:1;min-width:0}
+  .ev .t1{font:600 15px/1.3 var(--sans)}
+  .ev .t2{font:400 13px/1.35 var(--sans);color:var(--dim)}
+  .ev .ts{font:500 12px/1 var(--mono);color:var(--dim);white-space:nowrap}
+  .idle{font:400 14px/1.5 var(--sans);color:var(--dim);text-align:center;padding:34px 12px;border:1px dashed var(--line);border-radius:11px}
+
+  .toast{
+    position:absolute;right:18px;bottom:18px;
+    display:flex;gap:13px;align-items:center;padding:15px 18px;
+    background:rgba(62,207,142,.1);border:1.5px solid var(--ok);border-radius:11px;
+    animation:rise .34s cubic-bezier(.2,1.3,.4,1);
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
+  .toast .t1{font:700 15px/1.2 var(--sans);color:var(--ok)}
+  .toast .t2{font:400 13px/1.3 var(--sans);color:var(--dim)}
+
+  .foot{display:flex;flex-direction:column;align-items:center;gap:9px;margin-top:16px}
+  .reset{
+    padding:8px 16px;background:transparent;border:1px solid var(--line);border-radius:4px;
+    color:var(--dim);cursor:pointer;font:600 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  }
+  .reset:hover{border-color:var(--violet);color:var(--paper)}
+  .note{font:500 9px/1.5 var(--mono);letter-spacing:.1em;color:var(--dim);text-transform:uppercase;text-align:center;margin:0}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ================= GUEST ================= -->
+  <div class="dev phone">
+    <div class="frame"><div class="screen" id="phoneScreen">
+      <div class="stack" id="phoneStack">
+        <div class="p-vp">
+          <div class="bar"><b>Blue Harbour</b><span class="sp">BOOK</span></div>
+          <div class="body">
+
+            <div class="step on" data-step="1">
+              <h2>Choose your experience</h2>
+              <p class="sub">Available this week in Paros.</p>
+              <button class="opt" data-pick="Clear Boat — half day"><span class="em">🛥️</span><span><span class="t">Clear Boat — half day</span><span class="d">4 hrs · up to 6 guests</span></span></button>
+              <button class="opt" data-pick="Sunset cruise"><span class="em">🌅</span><span><span class="t">Sunset cruise</span><span class="d">2 hrs · up to 10 guests</span></span></button>
+              <button class="opt" data-pick="Private island tour"><span class="em">🏝️</span><span><span class="t">Private island tour</span><span class="d">Full day · up to 8 guests</span></span></button>
+            </div>
+
+            <div class="step" data-step="2">
+              <h2>Pick a date</h2>
+              <p class="sub" id="pickSub"></p>
+              <div class="grid7" id="cal"></div>
+              <button class="cta" id="toDetails" disabled>Continue</button>
+            </div>
+
+            <div class="step" data-step="3">
+              <h2>Your details</h2>
+              <p class="sub">So the team can confirm.</p>
+              <div class="fld"><label>Name</label><input id="gName" value="Alex Moreau" autocomplete="off"></div>
+              <div class="fld"><label>Email</label><input id="gMail" value="alex@example.com" autocomplete="off"></div>
+              <div class="fld"><label>Guests</label><input id="gPax" value="4" autocomplete="off"></div>
+              <button class="cta" id="toPay">Continue to payment</button>
+            </div>
+
+            <div class="step" data-step="4">
+              <h2>Payment</h2>
+              <div class="fake">⚠︎ Simulated checkout — no payment is taken and no card is stored</div>
+              <div class="fld"><label>Card number</label><input value="4242 4242 4242 4242" readonly tabindex="-1"></div>
+              <div class="fld"><label>Expiry / CVC</label><input value="12/29    ···" readonly tabindex="-1"></div>
+              <button class="cta" id="doPay">Pay €480</button>
+              <button class="cta ghost" id="backDet">Back</button>
+            </div>
+
+            <div class="step" data-step="5">
+              <div class="done">
+                <div class="tick">✓</div>
+                <h2>Booking confirmed</h2>
+                <p class="sub" id="confLine"></p>
+                <p class="ref" id="confRef"></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <p class="cap">Guest · phone</p>
+  </div>
+
+  <!-- ================= OPERATOR ================= -->
+  <div class="dev mon">
+    <div class="frame"><div class="screen" id="monScreen">
+      <div class="stack" id="monStack">
+        <div class="m-vp">
+          <div class="bar"><b>Control Centre</b><span class="sp">LIVE</span></div>
+          <div class="body">
+            <div class="kpis">
+              <div class="kpi"><b id="kEnq">0</b><span>Enquiries</span></div>
+              <div class="kpi"><b id="kHold">0</b><span>In progress</span></div>
+              <div class="kpi"><b id="kBook">0</b><span>Booked</span></div>
+              <div class="kpi"><b id="kTask">0</b><span>Tasks</span></div>
+            </div>
+            <p class="lane">Live activity</p>
+            <div class="feed" id="feed">
+              <div class="idle" id="idle">Waiting for guest activity — start a booking on the phone.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="stand2"></div><div class="stand"></div>
+    <p class="cap">Operator · desktop</p>
+  </div>
+
+</div>
+
+<div class="foot">
+  <button class="reset" id="reset">Restart demo</button>
+  <p class="note">Demo — invented records · no payment processed · nothing saved</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $=function(s){return document.querySelector(s);};
+
+  // ---- scale each true-size viewport into its frame ----
+  // The layouts are authored at real device widths; only the output is scaled.
+  function fit(screenId, stackId, logicalW){
+    var sc=document.getElementById(screenId), st=document.getElementById(stackId);
+    if(!sc||!st) return;
+    var k=sc.clientWidth/logicalW;
+    st.style.transform='scale('+k+')';
+  }
+  function fitAll(){ fit('phoneScreen','phoneStack',390); fit('monScreen','monStack',1280); }
+  window.addEventListener('resize',fitAll);
+  window.addEventListener('load',fitAll);
+  fitAll();
+
+  var state={pick:null,date:null,enq:0,hold:0,book:0,task:0,started:false};
+
+  function show(n){
+    document.querySelectorAll('.step').forEach(function(s){
+      s.classList.toggle('on', s.dataset.step===String(n));
+    });
+  }
+  function now(){var d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+  function bump(id,v,hot){var e=$(id);e.textContent=v;if(hot){e.classList.add('hot');setTimeout(function(){e.classList.remove('hot');},900);}}
+
+  function log(icon,title,sub,kind){
+    var idle=$('#idle'); if(idle) idle.remove();
+    var r=document.createElement('div');
+    r.className='ev'+(kind?' '+kind:'');
+    r.innerHTML='<span class="ic"></span><span class="tx"><span class="t1"></span><br><span class="t2"></span></span><span class="ts"></span>';
+    r.querySelector('.ic').textContent=icon;
+    r.querySelector('.t1').textContent=title;
+    r.querySelector('.t2').textContent=sub;
+    r.querySelector('.ts').textContent=now();
+    var f=$('#feed'); f.insertBefore(r,f.firstChild);
+    while(f.children.length>5) f.removeChild(f.lastChild);
+  }
+
+  document.querySelectorAll('[data-pick]').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('[data-pick]').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel'); state.pick=b.dataset.pick;
+      if(!state.started){state.started=true;state.enq++;bump('#kEnq',state.enq,true);
+        log('👀','New enquiry started','Guest opened the booking flow','new');}
+      $('#pickSub').textContent=state.pick;
+      log('🛥️','Experience selected',state.pick);
+      setTimeout(function(){show(2);},240);
+    });
+  });
+
+  (function cal(){
+    var wrap=$('#cal');
+    ['M','T','W','T','F','S','S'].forEach(function(n){
+      var s=document.createElement('div'); s.className='dn'; s.textContent=n; wrap.appendChild(s);
+    });
+    var t=new Date();
+    for(var i=0;i<28;i++){
+      var d=new Date(t.getTime()+i*86400000);
+      var b=document.createElement('button');
+      b.className='day'+(i<2?' off':'');
+      b.textContent=d.getDate();
+      b.dataset.iso=d.toISOString().slice(0,10);
+      b.addEventListener('click',function(){
+        document.querySelectorAll('.day').forEach(function(x){x.classList.remove('sel');});
+        this.classList.add('sel'); state.date=this.dataset.iso;
+        $('#toDetails').disabled=false;
+        log('📅','Date selected',state.date);
+      });
+      wrap.appendChild(b);
+    }
+  }());
+
+  $('#toDetails').addEventListener('click',function(){
+    state.hold++; bump('#kHold',state.hold,true);
+    log('⏳','Availability held','2 minutes while details are entered');
+    show(3);
+  });
+  $('#toPay').addEventListener('click',function(){
+    log('📝','Guest details captured',($('#gName').value||'—')+' · '+($('#gPax').value||'—')+' guests');
+    show(4);
+  });
+  $('#backDet').addEventListener('click',function(){show(3);});
+
+  $('#doPay').addEventListener('click',function(){
+    var btn=this; btn.disabled=true; btn.textContent='Processing…';
+    log('💳','Payment simulated','No card is charged in this demo');
+    setTimeout(function(){
+      state.hold=Math.max(0,state.hold-1); bump('#kHold',state.hold);
+      state.book++; bump('#kBook',state.book,true);
+      state.task+=2; bump('#kTask',state.task,true);
+
+      var ref='BH-'+Math.floor(1000+Math.random()*9000);
+      $('#confLine').textContent=state.pick+' · '+state.date;
+      $('#confRef').textContent='REF '+ref;
+
+      log('✅','Booking confirmed',state.pick+' · '+state.date+' · '+ref,'win');
+      log('📋','Tasks created','Send confirmation · assign skipper');
+
+      var t=document.createElement('div');
+      t.className='toast';
+      t.innerHTML='<span style="font-size:22px">🔔</span><span><span class="t1">New booking — '+ref+'</span><br><span class="t2">'+state.pick+'</span></span>';
+      document.querySelector('.m-vp').appendChild(t);
+      setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},6000);
+
+      btn.disabled=false; btn.textContent='Pay €480';
+      show(5);
+    },1100);
+  });
+
+  $('#reset').addEventListener('click',function(){
+    state={pick:null,date:null,enq:0,hold:0,book:0,task:0,started:false};
+    ['#kEnq','#kHold','#kBook','#kTask'].forEach(function(i){$(i).textContent='0';});
+    document.querySelectorAll('[data-pick],.day').forEach(function(x){x.classList.remove('sel');});
+    $('#toDetails').disabled=true;
+    $('#feed').innerHTML='<div class="idle" id="idle">Waiting for guest activity — start a booking on the phone.</div>';
+    show(1);
+  });
+
+  function h(){var v=Math.ceil(document.body.scrollHeight);
+    if(window.parent!==window) window.parent.postMessage({ngEmbed:'booking-flow',height:v},'*');}
+  window.addEventListener('load',h); window.addEventListener('resize',h);
+}());
+</script>
+</body>
+</html>
