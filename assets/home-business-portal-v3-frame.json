@@ -1,0 +1,13 @@
+{
+  "file": "home-business-portal-v3-frame.webp",
+  "width": 900,
+  "height": 600,
+  "screen": {
+    "x": 138,
+    "y": 131,
+    "w": 694,
+    "h": 274,
+    "radius": 34
+  },
+  "screenContent": "CRM/booking/automation"
+}

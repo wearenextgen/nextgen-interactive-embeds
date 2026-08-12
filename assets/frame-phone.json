@@ -1,0 +1,16 @@
+{
+  "file": "frame-phone.webp",
+  "glowVariant": "frame-phone-glow.webp",
+  "width": 468,
+  "height": 760,
+  "screen": {
+    "x": 39,
+    "y": 50,
+    "w": 390,
+    "h": 660,
+    "radius": 26
+  },
+  "recommendedDisplay": {
+    "heightRatioToDesktop": 0.55
+  }
+}

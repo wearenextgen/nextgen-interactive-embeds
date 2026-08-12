@@ -1,0 +1,16 @@
+{
+  "file": "frame-desktop.webp",
+  "glowVariant": "frame-desktop-glow.webp",
+  "width": 1400,
+  "height": 760,
+  "screen": {
+    "x": 60,
+    "y": 42,
+    "w": 1280,
+    "h": 620,
+    "radius": 8
+  },
+  "recommendedDisplay": {
+    "heightRatioToDesktop": 1.0
+  }
+}

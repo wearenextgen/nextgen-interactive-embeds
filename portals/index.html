@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Next Gen — Portals</title>
+<meta name="robots" content="noindex">
+<!--
+  PORTAL COMPOSITE — shell + live screen.
+
+  Each portal is a transparent frame WebP with the live HTML screen sitting
+  BEHIND its aperture. Aperture rects come straight from the sidecar JSON that
+  ships with each frame, expressed as percentages of the frame box, so the
+  whole thing scales without the screen ever drifting out of the cutout.
+
+    business  frame 900x600  screen 694x274 @138,131
+    artist    frame 900x900  screen 494x384 @199,134
+
+  The screens are iframes rather than inlined markup so each stays a single
+  self-contained file that can be opened and tested on its own.
+-->
+<style>
+  :root{ --v:#8115ff; --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:transparent;font-family:var(--sans);color:#f3efe4}
+
+  .wrap{
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:clamp(16px,3vw,44px);
+    align-items:end;
+    max-width:1240px; margin:0 auto; padding:clamp(10px,2vw,20px);
+  }
+  @media (max-width:900px){ .wrap{grid-template-columns:1fr} }
+
+  .portal{position:relative;width:100%}
+  /* aspect-ratio keeps the frame box exact; everything inside is a % of it */
+  .portal.business{aspect-ratio:900/600}
+  .portal.artist{aspect-ratio:900/900}
+
+  .shell{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+
+  .screen{
+    position:absolute;z-index:1;border:0;overflow:hidden;
+    background:#0b0b11;
+  }
+  /* percentages derived from the sidecar JSON */
+  .business .screen{
+    left:calc(138/900*100%); top:calc(131/600*100%);
+    width:calc(694/900*100%); height:calc(274/600*100%);
+    border-radius:calc(34/900*100%);
+  }
+  .artist .screen{
+    left:calc(199/900*100%); top:calc(134/900*100%);
+    width:calc(494/900*100%); height:calc(384/900*100%);
+    border-radius:calc(58/900*100%);
+  }
+
+  .cap{
+    margin:14px 0 0;text-align:center;
+    font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+    letter-spacing:.2em;text-transform:uppercase;opacity:.45;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <div class="portal business">
+      <iframe class="screen" src="business.html" title="Business operations screen" scrolling="no"></iframe>
+      <img class="shell" src="../assets/home-business-portal-v3-frame.webp" alt="" decoding="async">
+    </div>
+    <p class="cap">Business Systems</p>
+  </div>
+
+  <div>
+    <div class="portal artist">
+      <iframe class="screen" src="artist.html" title="Artist DAW screen" scrolling="no"></iframe>
+      <img class="shell" src="../assets/home-artist-portal-v3-frame.webp" alt="" decoding="async">
+    </div>
+    <p class="cap">Artist Worlds</p>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // report height so a Squarespace embed can size itself
+  function h(){
+    var v=Math.ceil(document.body.scrollHeight);
+    if(window.parent!==window) window.parent.postMessage({ngEmbed:'portals',height:v},'*');
+  }
+  window.addEventListener('load',h);
+  window.addEventListener('resize',h);
+}());
+</script>
+</body>
+</html>

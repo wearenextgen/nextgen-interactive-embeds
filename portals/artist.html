@@ -11,9 +11,8 @@
   Sits behind the translucent rainbow shell's transparent aperture. Nothing
   here draws the computer; the shell is a separate WebP on top.
 
-  Aperture measured from the v3 concept: 1052 x 1002 (1.05:1) — nearly square,
-  which is why this is a stacked DAW layout rather than the wide arrangement
-  a normal editor would use.
+  Authored at 988 x 768 = 2x the shipped aperture (494 x 384, 1.29:1) from
+  home-artist-portal-v3-frame.json.
 
   Motion follows DIRECTION.md exactly: four coloured clips on fixed lanes, a
   playhead crossing, waveforms animating INSIDE fixed clip geometry, mixer
@@ -39,15 +38,15 @@
   html,body{margin:0;background:transparent;overflow:hidden}
 
   .vp{
-    width:1052px;height:1002px;
+    width:988px;height:768px;
     transform-origin:top left;
     background:linear-gradient(165deg,var(--bg1) 0%,var(--bg2) 60%,#0c0818 100%);
     color:var(--paper);font-family:var(--sans);
     display:flex;flex-direction:column;
-    padding:38px 40px 34px;
+    padding:28px 32px 26px;
   }
 
-  .bar{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+  .bar{display:flex;align-items:center;gap:14px;margin-bottom:18px}
   .bar .rec{width:11px;height:11px;border-radius:50%;background:var(--c1);box-shadow:0 0 12px var(--c1)}
   .bar b{font:600 19px/1 var(--sans);letter-spacing:.01em}
   .bar .bpm{margin-left:auto;font:600 13px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
@@ -57,8 +56,8 @@
 
   .arrange{position:relative;flex:0 0 auto}
 
-  .lane{display:flex;align-items:center;height:128px;gap:0}
-  .lane + .lane{margin-top:16px}
+  .lane{display:flex;align-items:center;height:88px;gap:0}
+  .lane + .lane{margin-top:11px}
 
   .head{
     width:132px;flex:0 0 auto;padding-right:16px;
@@ -111,7 +110,7 @@
   }
 
   /* ---- mixer ---- */
-  .mix{margin-top:38px;display:flex;gap:16px;align-items:flex-end;flex:1;min-height:0}
+  .mix{margin-top:24px;display:flex;gap:16px;align-items:flex-end;flex:1;min-height:0}
   .ch{flex:1;display:flex;flex-direction:column;align-items:center;gap:11px;height:100%}
   .meter{
     width:100%;flex:1;min-height:0;border-radius:8px;
@@ -183,7 +182,7 @@
 
   function fit(){
     var vp=document.getElementById('vp');
-    var k=Math.min(window.innerWidth/1052, window.innerHeight/1002);
+    var k=Math.min(window.innerWidth/988, window.innerHeight/768);
     vp.style.transform='scale('+k+')';
   }
   window.addEventListener('resize',fit); fit();
