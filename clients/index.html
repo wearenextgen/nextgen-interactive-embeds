@@ -38,6 +38,7 @@
   }
 
   .track {
+    --loop-distance: 0px;
     display: flex;
     align-items: center;
     flex: none;
@@ -119,7 +120,7 @@
 
   @keyframes roll {
     from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+    to   { transform: translateX(calc(-1 * var(--loop-distance))); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -141,7 +142,7 @@
       <li class="item is-square"><a href="https://wearenextgen.io/creative-play" target="_top" aria-label="View the Creative Play project"><img src="logos/creative-play.png" alt="Creative Play" loading="eager" decoding="async"></a></li>
       <li class="item"><a href="https://wearenextgen.io/newcult" target="_top" aria-label="View the New Cult fashion project"><img src="logos/new-cult.png" alt="New Cult" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/kids-pets" target="_top" aria-label="View kids and pets work featuring Under Dog"><img src="logos/underdog.png" alt="Under Dog" loading="eager" decoding="async"></a></li>
-      <li class="item is-square"><a href="https://wearenextgen.io/our-projects" target="_top" aria-label="Explore selected work featuring Big Mouth Company"><img src="logos/big-mouth-company.png" alt="Big Mouth Company" loading="eager" decoding="async"></a></li>
+      <li class="item is-square" data-client="big-mouth"><a href="https://wearenextgen.io/our-projects" target="_top" aria-label="Explore selected work featuring Big Mouth Company"><img src="logos/big-mouth-company.png" alt="Big Mouth Company" loading="eager" decoding="async"></a></li>
       <li class="item is-meli"><a href="https://wearenextgen.io/music" target="_top" aria-label="View artist and music work featuring Meli"><img src="logos/meli.png" alt="Meli" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/medical" target="_top" aria-label="View medical and wellness work featuring Mantalos"><img src="logos/mantalos.png" alt="Mantalos Plastic Surgery" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/wrc1" target="_top" aria-label="View the World Capital project"><img src="logos/world-capital.png" alt="World Capital" loading="eager" decoding="async"></a></li>
@@ -156,6 +157,7 @@
 (function () {
   var sequence = document.getElementById('sequence');
   var mirror = document.getElementById('mirror');
+  var track = document.getElementById('track');
 
   // A logo that fails to load hides its slot rather than leaving a gap or a
   // broken-image icon. Blank cards are what made the previous breakage invisible.
@@ -168,12 +170,19 @@
     });
   });
 
-  // translateX(-50%) only loops seamlessly while the mirror exactly matches the
-  // source, so rebuild it whenever the source changes.
+  // The mirrored prefix makes the reset seamless, but Big Mouth stays only in
+  // the primary sequence so it appears once—not twice—during each loop.
+  function syncDistance() {
+    track.style.setProperty('--loop-distance', sequence.getBoundingClientRect().width + 'px');
+  }
+
   function build() {
     mirror.innerHTML = sequence.innerHTML;
+    var repeatedBigMouth = mirror.querySelector('[data-client="big-mouth"]');
+    if (repeatedBigMouth) repeatedBigMouth.remove();
     mirror.querySelectorAll('a').forEach(function (a) { a.setAttribute('tabindex', '-1'); });
     mirror.querySelectorAll('img').forEach(function (img) { img.setAttribute('loading', 'lazy'); });
+    requestAnimationFrame(syncDistance);
   }
   build();
 
@@ -186,7 +195,10 @@
     }
   }
   window.addEventListener('load', postHeight);
-  window.addEventListener('resize', postHeight);
+  window.addEventListener('resize', function () {
+    syncDistance();
+    postHeight();
+  });
 }());
 </script>
 
