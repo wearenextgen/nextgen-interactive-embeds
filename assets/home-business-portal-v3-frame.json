@@ -3,10 +3,10 @@
   "width": 900,
   "height": 600,
   "screen": {
-    "x": 138,
+    "x": 140,
     "y": 131,
-    "w": 694,
-    "h": 274,
+    "w": 691,
+    "h": 273,
     "radius": 34
   },
   "screenContent": "CRM/booking/automation"
