@@ -14,18 +14,22 @@
   html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
     background: transparent;
     overflow: hidden;
   }
 
   .rail {
-    --slot-h: clamp(66px, 8vw, 92px);
-    --slot-w: clamp(126px, 15vw, 190px);
+    /* Fit the height Squarespace already gives this iframe. Making the logo
+       boxes taller than the host iframe was what clipped whole marks. */
+    --slot-w: clamp(104px, 13vw, 154px);
     --gap: clamp(1.5rem, 4vw, 3.5rem);
     --speed: 38s;
     display: flex;
     width: 100%;
-    min-height: var(--slot-h);
+    height: 100vh;
+    min-height: 0;
     align-items: center;
     overflow: hidden;
     /* fade the ends so logos enter and leave instead of popping at a hard edge */
@@ -62,9 +66,10 @@
     place-items: center;
     /* a fixed box per logo is what stops wide wordmarks dwarfing square marks */
     width: var(--slot-w);
-    height: var(--slot-h);
+    height: 100vh;
+    max-height: 58px;
     box-sizing: border-box;
-    padding: clamp(8px, 1.2vw, 14px);
+    padding: clamp(4px, .65vw, 8px);
     opacity: .75;
     transition: opacity .25s ease, transform .25s ease;
   }
@@ -79,24 +84,37 @@
   }
 
   .item img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    /* Let the grid box constrain both axes. width:100% + height:100% allowed
+       tall source canvases to establish an oversized intrinsic height before
+       object-fit ran, which is why several logos disappeared vertically. */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     object-position: center;
     display: block;
   }
+
+  /* Grid items default to min-height:auto; explicitly zeroing it is what lets
+     a tall logo shrink to the available row instead of overflowing the iframe. */
+  .item a > img { min-width: 0; min-height: 0; }
 
   /* Squarish marks read smaller than wide wordmarks at the same box size,
      so they get a little extra room to balance the row optically. */
   .item.is-square a { width: clamp(84px, 10vw, 116px); }
 
+  /* Meli's source mark fills more of its canvas than the surrounding
+     wordmarks. This is optical normalization, not cropping. */
+  .item.is-meli a { width: clamp(92px, 11vw, 128px); }
+  .item.is-meli img { transform: scale(.72); }
+
   @media (max-width: 640px) {
     .rail {
-      --slot-h: 72px;
-      --slot-w: 138px;
+      --slot-w: 112px;
       --gap: 1.3rem;
     }
-    .item.is-square a { width: 92px; }
+    .item.is-square a { width: 72px; }
+    .item.is-meli a { width: 88px; }
   }
 
   @keyframes roll {
@@ -124,7 +142,7 @@
       <li class="item"><a href="https://wearenextgen.io/newcult" target="_top" aria-label="View the New Cult fashion project"><img src="logos/new-cult.png" alt="New Cult" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/kids-pets" target="_top" aria-label="View kids and pets work featuring Under Dog"><img src="logos/underdog.png" alt="Under Dog" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/our-projects" target="_top" aria-label="Explore selected work featuring Big Mouth Company"><img src="logos/big-mouth-company.png" alt="Big Mouth Company" loading="eager" decoding="async"></a></li>
-      <li class="item"><a href="https://wearenextgen.io/music" target="_top" aria-label="View artist and music work featuring Meli"><img src="logos/meli.png" alt="Meli" loading="eager" decoding="async"></a></li>
+      <li class="item is-meli"><a href="https://wearenextgen.io/music" target="_top" aria-label="View artist and music work featuring Meli"><img src="logos/meli.png" alt="Meli" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/medical" target="_top" aria-label="View medical and wellness work featuring Mantalos"><img src="logos/mantalos.png" alt="Mantalos Plastic Surgery" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/wrc1" target="_top" aria-label="View the World Capital project"><img src="logos/world-capital.png" alt="World Capital" loading="eager" decoding="async"></a></li>
       <li class="item is-square"><a href="https://wearenextgen.io/music" target="_top" aria-label="View artist and music work featuring Purple Being"><img src="logos/purple-being.png" alt="Purple Being" loading="eager" decoding="async"></a></li>
