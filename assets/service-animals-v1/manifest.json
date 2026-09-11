@@ -1,0 +1,98 @@
+[
+  {
+    "name": "music-snail",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 6,
+    "loop": 0,
+    "bytes": 141448,
+    "posterBytes": 24884,
+    "source": "assets/creative-final-2026-08-11/web/service-music-snail-animation.webp"
+  },
+  {
+    "name": "visual-chameleon",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 6,
+    "loop": 0,
+    "bytes": 130756,
+    "posterBytes": 22732,
+    "source": "assets/creative-final-2026-08-11/web/service-visual-chameleon-animation.webp"
+  },
+  {
+    "name": "motion-rabbit",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 10,
+    "loop": 0,
+    "bytes": 110396,
+    "posterBytes": 20772,
+    "source": "assets/creative-final-2026-08-11/web/service-motion-rabbit-animation.webp"
+  },
+  {
+    "name": "interactive-crab",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 6,
+    "loop": 0,
+    "bytes": 128630,
+    "posterBytes": 22592,
+    "source": "assets/creative-final-2026-08-11/web/service-interactive-crab-animation.webp"
+  },
+  {
+    "name": "web-clam",
+    "size": [
+      320,
+      320
+    ],
+    "frames": 10,
+    "loop": 0,
+    "bytes": 32248,
+    "posterBytes": 26694,
+    "source": "assets/creative-final-2026-09-11/web/service-web-clam-v4-animation.webp"
+  },
+  {
+    "name": "social-pigeon",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 10,
+    "loop": 0,
+    "bytes": 209642,
+    "posterBytes": 22348,
+    "source": "assets/creative-final-2026-08-11/web/service-social-pigeon-animation.webp"
+  },
+  {
+    "name": "3d-beetle",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 6,
+    "loop": 0,
+    "bytes": 135028,
+    "posterBytes": 23268,
+    "source": "assets/creative-final-2026-08-11/web/service-3d-beetle-animation.webp"
+  },
+  {
+    "name": "consulting-owl",
+    "size": [
+      256,
+      320
+    ],
+    "frames": 6,
+    "loop": 0,
+    "bytes": 180988,
+    "posterBytes": 31250,
+    "source": "assets/creative-final-2026-08-11/web/service-consulting-owl-animation.webp"
+  }
+]
