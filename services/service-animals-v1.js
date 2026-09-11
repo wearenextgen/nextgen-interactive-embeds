@@ -21,7 +21,7 @@
   const style = document.createElement('style');
   style.textContent = `
     .ng-service-animal-ready > .sqs-block-content { position:relative; }
-    .ng-service-animal-ready > .sqs-block-content > .fluid-image-component-root { visibility:hidden; pointer-events:none; }
+    .ng-service-animal-ready > .sqs-block-content > .fluid-image-component-root { opacity:0!important; visibility:hidden!important; pointer-events:none; }
     .ng-service-animal-link { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border:0!important; background:none; border-radius:6px; }
     .ng-service-animal-link img { display:block; width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain!important; object-position:center; border:0; }
     .ng-service-animal-link:focus-visible { outline:2px solid #c68cff; outline-offset:3px; }
